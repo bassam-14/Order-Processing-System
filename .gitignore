@@ -1,33 +1,77 @@
-# --- OS & System Files (Prevent "junk" files) ---
+# ==================================
+# 1. OPERATING SYSTEM & GENERIC
+# ==================================
 .DS_Store
 Thumbs.db
 *.log
 
-# --- IDE & Editors (Prevent team conflicts) ---
+# ==================================
+# 2. IDE & EDITORS (Prevent config conflicts)
+# ==================================
+# IntelliJ IDEA
 .idea/
+*.iws
+*.iml
+*.ipr
+
+# VS Code
 .vscode/
-*.swp
+*.code-workspace
+
+# Eclipse
+.metadata
+.classpath
 .project
 .settings/
-nbproject/
+bin/
 
-# --- PHP & Backend ---
-vendor/
-composer.lock
-error_log
-php_errors.log
+# ==================================
+# 3. JAVA BACKEND (Spring Boot / Maven)
+# ==================================
+# Build results
+target/
+build/
+out/
 
-# --- Database & Security (CRITICAL) ---
-# Do NOT share your local DB credentials
-db_connect.php
-config.php
+# Bytecode & Archives
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven Wrapper (Optional: usually good to commit, but ignore logs)
+.mvn/wrapper/maven-wrapper.properties
+
+# Spring Boot Logs
+logs/
+*.pid
+
+# ==================================
+# 4. FRONTEND (React / Node.js)
+# ==================================
+# Dependencies (CRITICAL: Never commit this)
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==================================
+# 5. SECURITY & SECRETS (Most Important)
+# ==================================
+# Ignore environment variables for React
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Ignore large data dumps, but keep your schema design
-*.sql.gz
-backups/
-
-# --- Uploads (Optional) ---
-# If you allow image uploads for book covers, ignore the files but keep the folder
-uploads/*
-!uploads/.gitkeep
+# Ignore Java secrets (Spring Boot)
+# Tip: Commit 'application.properties', but ignore the 'secrets' override
+src/main/resources/application-secrets.properties
+**/secrets.properties
