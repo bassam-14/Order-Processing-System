@@ -1,0 +1,33 @@
+# --- OS & System Files (Prevent "junk" files) ---
+.DS_Store
+Thumbs.db
+*.log
+
+# --- IDE & Editors (Prevent team conflicts) ---
+.idea/
+.vscode/
+*.swp
+.project
+.settings/
+nbproject/
+
+# --- PHP & Backend ---
+vendor/
+composer.lock
+error_log
+php_errors.log
+
+# --- Database & Security (CRITICAL) ---
+# Do NOT share your local DB credentials
+db_connect.php
+config.php
+.env
+
+# Ignore large data dumps, but keep your schema design
+*.sql.gz
+backups/
+
+# --- Uploads (Optional) ---
+# If you allow image uploads for book covers, ignore the files but keep the folder
+uploads/*
+!uploads/.gitkeep
