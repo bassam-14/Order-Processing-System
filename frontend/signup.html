@@ -2,32 +2,140 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sign Up</title>
-    <link rel="stylesheet" href="css/login.css">
+    <title>Create Account</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/signup.css">
 </head>
 <body>
 
-<div class="login-card">
-    <h1>Create Account</h1>
-    <p class="subtitle">Register to access the bookstore</p>
+<div class="signup-wrapper">
+    <div class="signup-card">
+        <h1>Create Account</h1>
+        <p class="subtitle">Join our bookstore community</p>
 
-    <form>
-        <input type="text" placeholder="First Name">
-        <input type="text" placeholder="Last Name">
-        <input type="email" placeholder="Email">
-        <input type="text" placeholder="Phone Number">
-        <input type="text" placeholder="Shipping Address">
-        <input type="text" placeholder="Username">
-        <input type="password" placeholder="Password">
+        <form id="signup-form" onsubmit="handleSignup(event)">
+            
+            <div class="form-row">
+                <div class="input-group">
+                    <label>First Name</label>
+                    <input type="text" placeholder="e.g. John" required 
+                           oninput="noNumbers(this)">
+                </div>
+                <div class="input-group">
+                    <label>Last Name</label>
+                    <input type="text" placeholder="e.g. Doe" required 
+                           oninput="noNumbers(this)">
+                </div>
+            </div>
 
-        <button type="submit">Sign Up</button>
-    </form>
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" placeholder="Choose a unique username" required minlength="4">
+            </div>
 
-    <p class="small-text">
-        Already have an account?
-        <a href="login.html">Login here</a>
-    </p>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email-input" placeholder="user@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" placeholder="01xxxxxxxxx" required
+                           pattern="[0-9]{10,15}"
+                           title="Phone number must be 10-15 digits"
+                           oninput="onlyNumbers(this)">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Shipping Address</label>
+                <input type="text" placeholder="Street, City, Country" required>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="pass1" placeholder="8+ characters" 
+                           required minlength="8">
+                </div>
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="pass2" placeholder="Repeat password" 
+                           required minlength="8">
+                </div>
+            </div>
+
+            <p id="error-msg" class="error-text" style="display: none;"></p>
+
+            <button type="submit" class="action-btn" id="submit-btn">Sign Up</button>
+        </form>
+
+        <p class="small-text">
+            Already have an account?
+            <a href="login.html">Login here</a>
+        </p>
+    </div>
 </div>
+
+<script>
+    // 1. Force Numbers Only (Phone)
+    function onlyNumbers(input) {
+        input.value = input.value.replace(/\D/g, ''); 
+    }
+
+    // 2. Force Letters Only (Names)
+    function noNumbers(input) {
+        input.value = input.value.replace(/[^a-zA-Z\s]/g, ''); 
+    }
+
+    // 3. Handle Submit
+    function handleSignup(event) {
+        // Prevent form from reloading the page
+        event.preventDefault(); 
+        
+        const email = document.getElementById('email-input').value;
+        const p1 = document.getElementById('pass1').value;
+        const p2 = document.getElementById('pass2').value;
+        const errorBox = document.getElementById('error-msg');
+        const btn = document.getElementById('submit-btn');
+
+        // --- VALIDATION A: STRICT EMAIL CHECK ---
+        // Must contain text + @ + text + . + text
+        const strictEmailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+        
+        if (!strictEmailPattern.test(email)) {
+            errorBox.innerText = "Error: Invalid Email! You are missing the domain (e.g. .com)";
+            errorBox.style.display = "block";
+            return; // Stop here
+        }
+
+        // --- VALIDATION B: PASSWORDS MATCH ---
+        if (p1 !== p2) {
+            errorBox.innerText = "Error: Passwords do not match!";
+            errorBox.style.display = "block";
+            return; // Stop here
+        }
+
+        // --- SUCCESS ---
+        errorBox.style.display = "none";
+
+        // Loading State
+        btn.disabled = true;
+        btn.innerText = "Creating Account...";
+        btn.style.opacity = "0.7";
+
+        // Simulate Database Creation
+        setTimeout(() => {
+            btn.innerText = "Success! Redirecting...";
+            btn.style.background = "#2f6f4e";
+
+            // Redirect to Login
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1000);
+        }, 2000);
+    }
+</script>
 
 </body>
 </html>

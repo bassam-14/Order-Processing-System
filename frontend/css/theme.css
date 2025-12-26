@@ -1,0 +1,43 @@
+:root {
+    /* --- YOUR ORIGINAL COLORS --- */
+    
+    /* Dark Theme (Admin & Login) */
+    --primary-dark: #0f1512;       /* The original deep greenish-black */
+    --text-light: #f1f3f2;         /* White-ish text */
+    --link-green: #7fd1a3;         /* The light green for links */
+    
+    /* Buttons */
+    --btn-green: #2f6f4e;          /* Your original Green Button */
+    --btn-green-hover: #3a805c;
+    
+    /* Light Theme (Customer Pages) */
+    --bg-arctic: #D3D1CE;          /* The light gray background */
+    --header-gray: #6C6D74;        /* The gray topbar for customers */
+    
+    /* Gradients */
+    --bg-gradient-dark: linear-gradient(180deg, #0f1512 0%, #141c18 60%, #1a2420 100%);
+    --bg-gradient-light: linear-gradient(180deg, #D3D1CE 0%, #B3B7BA 100%);
+}
+
+/* Base Reset */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+
+/* Standard Button Class */
+.action-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--btn-green);   /* Uses your Green */
+    color: white;
+    border-radius: 999px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.action-btn:hover {
+    background: var(--btn-green-hover);
+    transform: translateY(-2px);
+}

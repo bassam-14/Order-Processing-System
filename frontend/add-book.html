@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Book</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/add-book.css">
+</head>
+<body>
+
+<header class="topbar">
+    <h1>Add New Book</h1>
+    <a href="admin.html" class="logout">Back</a>
+</header>
+
+<main class="form-container">
+    <form class="form-card" action="admin.html">
+        <h2>Book Details</h2>
+        <p class="subtitle">Enter the properties of the new book below.</p>
+
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label>ISBN Number</label>
+                <input type="text" placeholder="978-..." pattern="\d{13}" title="Enter exactly 13 digits" required>
+            </div>
+
+            <div class="input-group">
+                <label>Category</label>
+                <select required>
+                    <option value="">Select Category</option>
+                    <option value="Science">Science</option>
+                    <option value="Art">Art</option>
+                    <option value="Religion">Religion</option>
+                    <option value="History">History</option>
+                    <option value="Geography">Geography</option>
+                </select>
+            </div>
+
+            <div class="input-group full-width">
+                <label>Book Title</label>
+                <input type="text" placeholder="e.g. Database Systems" required>
+            </div>
+
+            <div class="input-group full-width">
+                <label>Author(s)</label>
+                <input type="text" placeholder="e.g. Elmasri, Navathe" required>
+            </div>
+
+            <div class="input-group">
+                <label>Publisher</label>
+                <input type="text" placeholder="e.g. Pearson" required>
+            </div>
+
+            <div class="input-group">
+                <label>Publication Year</label>
+                <input type="number" placeholder="2025" min="1900" max="2100" required>
+            </div>
+
+            <div class="input-group">
+                <label>Selling Price ($)</label>
+                <input type="number" placeholder="0.00" step="0.01" min="0.01" required>
+            </div>
+
+            <div class="input-group">
+                <label>Initial Stock</label>
+                <input type="number" placeholder="0" min="0" required>
+            </div>
+
+            <div class="input-group full-width">
+                <label>Threshold (Minimum Quantity)</label>
+                <input type="number" placeholder="e.g. 5" min="0" required>
+                <small style="color: #B3B7BA; font-size: 12px;">System will auto-order when stock drops below this.</small>
+            </div>
+        </div>
+
+        <button type="submit" class="action-btn">Add Book</button>
+    </form>
+</main>
+
+</body>
+</html>

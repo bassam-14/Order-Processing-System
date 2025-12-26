@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>My Profile</title>
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/profile.css">
 </head>
 <body>
@@ -14,28 +15,126 @@
 
 <main class="profile-container">
 
-    <form class="profile-card">
-        <h2>Personal Information</h2>
-
-        <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" placeholder="John Doe">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="avatar-circle">JD</div>
+            <h2>John Doe</h2>
+            <p class="subtitle">Customer Account</p>
         </div>
 
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" placeholder="john@email.com">
-        </div>
+        <form id="profile-form" onsubmit="handleSave(event)">
+            
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Username (Read Only)</label>
+                    <input type="text" value="johndoe123" readonly 
+                           style="opacity: 0.7; cursor: not-allowed; border-color: transparent; background: rgba(0,0,0,0.2);">
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email-input" placeholder="john@example.com" required>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" placeholder="********">
-        </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>First Name</label>
+                    <input type="text" placeholder="e.g. John" required oninput="noNumbers(this)">
+                </div>
+                <div class="input-group">
+                    <label>Last Name</label>
+                    <input type="text" placeholder="e.g. Doe" required oninput="noNumbers(this)">
+                </div>
+            </div>
 
-        <a href="#" class="action">Save Changes</a>
-    </form>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" placeholder="01xxxxxxxxx" required
+                           pattern="[0-9]{10,15}"
+                           title="Phone number must be 10-15 digits"
+                           oninput="onlyNumbers(this)">
+                </div>
+                <div class="input-group">
+                    <label>Shipping Address</label>
+                    <input type="text" placeholder="e.g. 123 Main St, Alexandria" required>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <h3 style="margin-bottom: 15px; color: #f1f3f2; font-size: 16px;">Security</h3>
+            
+            <div class="input-group">
+                <label>New Password (Leave blank to keep current)</label>
+                <input type="password" placeholder="********" minlength="8" 
+                       title="Password must be at least 8 characters">
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="action-btn" id="save-btn">Save Changes</button>
+            </div>
+
+        </form>
+    </div>
 
 </main>
+
+<script>
+    // 1. Force Numbers Only
+    function onlyNumbers(input) {
+        input.value = input.value.replace(/\D/g, ''); 
+    }
+
+    // 2. Force Letters Only
+    function noNumbers(input) {
+        input.value = input.value.replace(/[^a-zA-Z\s]/g, ''); 
+    }
+
+    // 3. Handle Save with STRICT EMAIL CHECK
+    function handleSave(event) {
+        event.preventDefault(); // Stop page reload
+
+        const btn = document.getElementById('save-btn');
+        const email = document.getElementById('email-input').value;
+        const originalText = "Save Changes"; // Store original text
+
+        // --- STRICT EMAIL VALIDATION ---
+        const strictEmailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+        
+        if (!strictEmailPattern.test(email)) {
+            // Visual Error Feedback
+            btn.innerText = "Error: Invalid Email (Missing .com)";
+            btn.style.background = "#ff6b6b"; // Red
+            
+            // Reset button after 2 seconds so they can try again
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = ""; // Reset to CSS default
+            }, 2000);
+            return; // Stop the function here!
+        }
+
+        // --- IF VALIDATION PASSES, CONTINUE SAVING ---
+
+        // Visual Feedback: Loading
+        btn.disabled = true;
+        btn.innerText = "Saving...";
+        btn.style.opacity = "0.7";
+
+        // Simulate Database Wait Time (1.5s)
+        setTimeout(() => {
+            // Visual Feedback: Success
+            btn.innerText = "Saved Successfully! \u2713";
+            btn.style.background = "#2f6f4e"; // Green
+
+            // Redirect to Dashboard after 1 second
+            setTimeout(() => {
+                window.location.href = "customer.html";
+            }, 1000);
+        }, 1500);
+    }
+</script>
 
 </body>
 </html>

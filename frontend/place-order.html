@@ -2,42 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Place Order</title>
+    <title>Place Replenishment Order</title>
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/admin-place-order.css">
 </head>
 <body>
 
 <header class="topbar">
     <h1>Place Replenishment Order</h1>
-    <a href="admin.html" class="logout">Back</a>
+    <a href="admin.html" class="logout">Cancel</a>
 </header>
 
 <main class="container">
 
-    <div class="card">
-        <h2>Book Stock Information</h2>
-
-        <div class="info">
-            <p><strong>ISBN:</strong> 9780132350884</p>
-            <p><strong>Title:</strong> Clean Code</p>
-            <p><strong>Publisher:</strong> Pearson</p>
+    <div class="order-card">
+        <div class="card-header">
+            <h2>Restock Inventory</h2>
+            <p class="subtitle">Manually order more copies from the publisher.</p>
         </div>
 
-        <div class="status">
-            <p><strong>Current Stock:</strong> 3</p>
-            <p><strong>Threshold:</strong> 5</p>
-            <p class="warning">Stock is below threshold</p>
+        <div class="book-details">
+            <div class="detail-row">
+                <span class="label">Book Title:</span>
+                <span class="value">Clean Code</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">ISBN:</span>
+                <span class="value mono">978-0132350884</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Publisher:</span>
+                <span class="value">Pearson</span>
+            </div>
         </div>
 
-        <div class="order-box">
-            <label>Order Quantity</label>
-            <input type="text" value="10" readonly>
+        <div class="stock-status-box">
+            <div class="status-item">
+                <span class="label">Current Stock</span>
+                <span class="number critical">3</span>
+            </div>
+            <div class="status-item">
+                <span class="label">Threshold</span>
+                <span class="number">5</span>
+            </div>
+            <div class="status-message warning">
+                &#9888; Stock is below threshold. Restock recommended.
+            </div>
         </div>
 
-        <button class="action">Place Order</button>
+        <form id="order-form" onsubmit="handlePlaceOrder(event)">
+            <div class="input-group">
+                <label>Order Quantity</label>
+                <input type="number" id="qty" value="10" min="1" required 
+                       class="qty-input" 
+                       placeholder="Enter quantity...">
+            </div>
+
+            <div class="summary-row">
+                <span>Estimated Cost:</span>
+                <span class="cost">$200.00</span>
+            </div>
+
+            <button type="submit" class="action-btn" id="submit-btn">
+                Send Order to Publisher
+            </button>
+        </form>
     </div>
 
 </main>
+
+<script>
+    function handlePlaceOrder(event) {
+        event.preventDefault(); // Stop form from reloading immediately
+
+        const btn = document.getElementById('submit-btn');
+        const originalText = btn.innerText;
+
+        // 1. Validation Logic
+        const qty = document.getElementById('qty').value;
+        if (qty < 1) {
+            alert("Quantity must be at least 1");
+            return;
+        }
+
+        // 2. Loading State
+        btn.disabled = true;
+        btn.innerText = "Sending Request...";
+        btn.style.opacity = "0.7";
+
+        // 3. Simulate API Call (2 seconds)
+        setTimeout(() => {
+            btn.innerText = "Order Placed! \u2713";
+            btn.style.background = "#2f6f4e"; // Green
+
+            // 4. Redirect to Confirm Orders page to see the new pending order
+            setTimeout(() => {
+                window.location.href = "confirm-orders.html";
+            }, 1000);
+        }, 1500);
+    }
+</script>
 
 </body>
 </html>

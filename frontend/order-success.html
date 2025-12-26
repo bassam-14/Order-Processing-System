@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Order Success</title>
+    <title>Order Confirmed</title>
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/order-success.css">
 </head>
 <body>
@@ -10,19 +11,58 @@
 <main class="success-container">
 
     <div class="success-card">
-        <h1>Order Placed Successfully 🎉</h1>
-        <p>Your order has been processed and will be delivered soon.</p>
-
-        <div class="details">
-            <p><strong>Order Number:</strong> #1042</p>
-            <p><strong>Total Paid:</strong> $120</p>
+        <div class="icon-circle">
+            <span class="checkmark">&#10003;</span>
         </div>
 
-        <a href="customer.html" class="action">Back to Dashboard</a>
-        <a href="orders.html" class="secondary">View My Orders</a>
+        <h1>Order Placed Successfully!</h1>
+        <p class="subtitle">Thank you for your purchase. A confirmation email has been sent.</p>
+
+        <div class="details-box">
+            <div class="detail-row">
+                <span>Order Number:</span>
+                <strong id="order-id">#ORD-....</strong>
+            </div>
+            <div class="detail-row">
+                <span>Date:</span>
+                <strong id="order-date">...</strong>
+            </div>
+            <div class="detail-row">
+                <span>Total Amount:</span>
+                <strong class="highlight">$120.00</strong>
+            </div>
+            <div class="detail-row">
+                <span>Est. Delivery:</span>
+                <strong id="delivery-date">...</strong>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="customer.html" class="action-btn">Return to Dashboard</a>
+            <a href="orders.html" class="secondary-link">View All Orders</a>
+        </div>
     </div>
 
 </main>
+
+<script>
+    // 1. Generate Random Order ID
+    const randomNum = Math.floor(Math.random() * 9000) + 1000;
+    document.getElementById('order-id').innerText = `#ORD-2025-${randomNum}`;
+
+    // 2. Set Today's Date
+    const today = new Date();
+    document.getElementById('order-date').innerText = today.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric'
+    });
+
+    // 3. Set Delivery Date (+3 Days)
+    const delivery = new Date();
+    delivery.setDate(today.getDate() + 3);
+    document.getElementById('delivery-date').innerText = delivery.toLocaleDateString('en-US', {
+        weekday: 'short', month: 'short', day: 'numeric'
+    });
+</script>
 
 </body>
 </html>

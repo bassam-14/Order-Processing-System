@@ -6,24 +6,18 @@
     font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* PAGE */
+/* PAGE BACKGROUND - Dark Theme (Uses variables from theme.css) */
 body {
     min-height: 100vh;
-    background: linear-gradient(
-        180deg,
-        #0f1512 0%,
-        #141c18 60%,
-        #1a2420 100%
-    );
-    color: #1f2937;
+    background: var(--bg-gradient-dark);
+    color: #f1f3f2;
 }
-
 
 /* TOP BAR */
 .topbar {
-    background: #0f1512;
+    background: var(--primary-dark);
     color: #f1f3f2;
-    padding: 18px 40px;              /* a bit wider */
+    padding: 18px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -45,67 +39,84 @@ body {
     text-decoration: underline;
 }
 
-/* DASHBOARD GRID */
+/* DASHBOARD GRID - UPDATED FOR 6 CARDS */
 .dashboard-grid {
-    max-width: 1400px;               /* BIGGER & more centered */
-    margin: 100px auto;              /* pushes cards to visual center */
+    max-width: 1400px;
+    margin: 80px auto;
     padding: 0 60px;
 
     display: grid;
-    grid-template-columns: 1.6fr 1fr 1fr; /* BIGGER LEFT CARD */
-    grid-auto-rows: minmax(260px, auto);  /* BIGGER ROW HEIGHT */
-    gap: 48px;                        /* AIR BETWEEN CARDS */
+    /* 3 Columns: Big Left, Middle, Right */
+    grid-template-columns: 1.6fr 1fr 1fr; 
+    grid-auto-rows: minmax(260px, auto);
+    gap: 40px;
 
     justify-content: center;
     align-items: center;
 }
 
-/* CARDS AS BACKGROUND PANELS */
+/* CARDS */
 .card {
     position: relative;
     border-radius: 22px;
     padding: 30px;
-    min-height: 280px;               /* cards feel solid */
-
+    min-height: 280px;
+    
+    background-color: #2f3640; 
     background-size: cover;
     background-position: center;
 
-    box-shadow:
-        0 22px 44px rgba(0,0,0,0.5),
-        0 8px 18px rgba(0,0,0,0.35);
-
+    box-shadow: 0 22px 44px rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-
     overflow: hidden;
 }
 
-/* DARK OVERLAY */
+/* Dark Overlay */
 .card::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.48);
+    background: rgba(0,0,0,0.55); /* Slightly darker overlay */
     z-index: 0;
 }
 
-/* CONTENT ABOVE OVERLAY */
+/* Content z-index fix */
 .card > * {
     position: relative;
     z-index: 1;
     color: #f1f3f2;
 }
 
-/* BIG CARD */
+/* --- BACKGROUND IMAGES MAPPING --- */
+
+/* 1. Add Book (Big Card) */
 .card.big {
     grid-row: span 2;
-    min-height: 600px;               /* BIG, CLEAR HERO CARD */
+    min-height: 600px;
+    background-image: url("../images/add.jpg");
 }
 
-/* TEXT */
+/* 2. Update Book */
+.card:nth-of-type(2) { background-image: url("../images/update.jpg"); }
+
+/* 3. Confirm Orders */
+.card:nth-of-type(3) { background-image: url("../images/confirm.jpg"); }
+
+/* 4. Restock (NEW CARD) */
+.card:nth-of-type(4) { background-image: url("../images/books.jpg"); }
+
+/* 5. Search */
+.card:nth-of-type(5) { background-image: url("../images/search.jpg"); }
+
+/* 6. Reports */
+.card:nth-of-type(6) { background-image: url("../images/reports.jpg"); }
+
+
+/* TEXT & BUTTONS */
 .card h3 {
-    font-size: 18px;                 /* more presence */
+    font-size: 19px;
     font-weight: 600;
     margin-bottom: 12px;
 }
@@ -116,47 +127,27 @@ body {
     line-height: 1.6;
 }
 
-/* ACTION BUTTON */
 .action {
     align-self: flex-start;
-    padding: 12px 22px;              /* slightly bigger */
-    background: linear-gradient(
-        135deg,
-        #2f6f4e,
-        #265c41
-    );
+    padding: 12px 22px;
+    background: var(--btn-green); 
     color: white;
     border-radius: 12px;
     text-decoration: none;
     font-size: 14px;
+    font-weight: 500;
     box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+    transition: background 0.2s;
 }
 
 .action:hover {
-    background: linear-gradient(
-        135deg,
-        #3a805c,
-        #2f6f4e
-    );
+    background: var(--btn-green-hover);
 }
 
-/* BACKGROUND IMAGES PER CARD */
-.card.big {
-    background-image: url("../images/add.jpg");
-}
-
-.card:nth-of-type(2) {
-    background-image: url("../images/update.jpg");
-}
-
-.card:nth-of-type(3) {
-    background-image: url("../images/confirm.jpg");
-}
-
-.card:nth-of-type(4) {
-    background-image: url("../images/search.jpg");
-}
-
-.card:nth-of-type(5) {
-    background-image: url("../images/reports.jpg");
+/* Responsive */
+@media (max-width: 900px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        padding: 0 30px;
+    }
 }

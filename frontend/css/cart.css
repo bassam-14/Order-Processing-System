@@ -1,34 +1,25 @@
-/* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
-}
+/* src/frontend/css/cart.css */
 
-/* PAGE */
+/* 1. PAGE BACKGROUND - Dark Theme */
 body {
     min-height: 100vh;
-    background: linear-gradient(
-        180deg,
-        #D3D1CE 0%,      /* Arctic */
-        #B3B7BA 100%     /* Slopes */
-    );
-    color: #262E36;
+    background: var(--bg-gradient-dark); /* The Dark #0f1512 Gradient */
+    color: #f1f3f2; /* Light Text */
 }
 
-/* TOP BAR */
+/* 2. TOP BAR - Matches Admin */
 .topbar {
-    background: #6C6D74;            /* Après Ski */
-    color: #ffffff;
+    background: var(--primary-dark); /* #0f1512 */
+    color: #f1f3f2;
     padding: 18px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .logout {
-    color: #D3D1CE;
+    color: #7fd1a3; /* Green Link */
     text-decoration: none;
     font-size: 14px;
 }
@@ -37,45 +28,70 @@ body {
     text-decoration: underline;
 }
 
-/* CONTAINER */
+/* 3. CONTAINER */
 .cart-container {
     max-width: 1000px;
-    margin: 50px auto;
+    margin: 60px auto;
     padding: 0 40px;
 }
 
-/* TABLE */
+/* 4. TABLE - Glassy Dark Style */
 .cart-table {
     width: 100%;
     border-collapse: collapse;
-    background: #D3D1CE;
+    
+    background: rgba(255, 255, 255, 0.08); /* Dark Glass */
+    backdrop-filter: blur(12px);
+    
     border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
 .cart-table th,
 .cart-table td {
-    padding: 16px;
+    padding: 18px;
     text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: #f1f3f2;
 }
 
 .cart-table thead {
-    background: #6C6D74;
-    color: white;
+    background: rgba(0,0,0,0.2); /* Slightly darker header */
+    color: #7fd1a3; /* Green accent text for headers */
+    font-weight: 600;
 }
 
-.cart-table tbody tr {
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-}
-
-.cart-table tbody tr:last-child {
+.cart-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-/* REMOVE BUTTON */
+/* 5. INPUTS (Dark Mode) */
+.qty-input {
+    width: 60px;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    
+    background: rgba(255,255,255,0.15); /* Lighter transparent bg */
+    color: #f1f3f2;
+    text-align: center;
+    outline: none;
+}
+
+/* Validation: Red border if invalid */
+.qty-input:invalid {
+    border: 1px solid #8b3a3a;
+    background-color: rgba(139, 58, 58, 0.2);
+}
+
+.qty-input:focus {
+    background: rgba(255,255,255,0.25);
+}
+
+/* 6. REMOVE BUTTON */
 .remove-btn {
-    color: #8b3a3a;
+    color: #ff6b6b; /* Bright Red for Dark Mode */
     font-size: 14px;
     text-decoration: none;
     font-weight: 500;
@@ -85,30 +101,47 @@ body {
     text-decoration: underline;
 }
 
-/* SUMMARY */
+/* 7. SUMMARY SECTION */
 .cart-summary {
     margin-top: 30px;
-    background: #D3D1CE;
-    padding: 24px;
+    
+    background: rgba(255, 255, 255, 0.08); /* Dark Glass */
+    backdrop-filter: blur(12px);
+    
+    padding: 24px 32px;
     border-radius: 18px;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-/* BUTTON */
+.totals p {
+    margin-bottom: 6px;
+    font-size: 15px;
+    color: #d1d5db;
+}
+
+.total-price {
+    font-size: 20px;
+    color: #7fd1a3; /* Green for money */
+}
+
+/* 8. CHECKOUT BUTTON - Your Green Button */
 .action {
-    padding: 12px 26px;
-    background: #6C6D74;
+    padding: 12px 30px;
+    background: #2f6f4e;
     color: white;
     border-radius: 999px;
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.3);
 }
 
 .action:hover {
-    background: #262E36;
+    background: #3a805c;
+    transform: translateY(-2px);
 }

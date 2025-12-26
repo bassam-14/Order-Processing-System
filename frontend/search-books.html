@@ -3,77 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <title>Search Books</title>
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/search-books.css">
 </head>
 <body>
 
 <header class="topbar">
-    <h1>Search Books</h1>
-    <a href="customer.html" class="logout">Back</a>
+    <h1>Search Collection</h1>
+    <a href="#" class="logout" id="back-link">Back</a>
 </header>
 
-<main class="container">
+<main class="search-container">
 
-    <!-- SEARCH FILTERS -->
-    <div class="search-card">
-        <h2>Search Criteria</h2>
-
-        <div class="filters">
-            <input type="text" placeholder="ISBN">
-            <input type="text" placeholder="Title">
-            <input type="text" placeholder="Author">
-            <input type="text" placeholder="Publisher">
-
-            <select>
-                <option value="">Category</option>
-                <option>Science</option>
-                <option>Art</option>
-                <option>Religion</option>
-                <option>History</option>
-                <option>Geography</option>
+    <div class="search-header">
+        <form onsubmit="handleSearch(event)" class="search-box">
+            <input type="text" id="search-input" 
+                   placeholder="Search by Title, Author, or ISBN..." 
+                   required minlength="2">
+            
+            <select id="category-filter">
+                <option value="all">All Categories</option>
+                <option value="Science">Science</option>
+                <option value="Technology">Technology</option>
+                <option value="Fiction">Fiction</option>
             </select>
-        </div>
 
-        <button class="action">Search</button>
+            <button type="submit" class="action-btn">Search</button>
+        </form>
     </div>
 
-    <!-- RESULTS TABLE -->
-    <div class="results-card">
-        <h2>Search Results</h2>
+    <div class="results-grid" id="results-area">
+        </div>
 
-        <table class="results-table">
-            <thead>
-            <tr>
-                <th>ISBN</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Available</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>9780132350884</td>
-                <td>Clean Code</td>
-                <td>Robert C. Martin</td>
-                <td>Science</td>
-                <td>$30</td>
-                <td class="available">Yes</td>
-            </tr>
-            <tr>
-                <td>9780201633610</td>
-                <td>Design Patterns</td>
-                <td>GoF</td>
-                <td>Science</td>
-                <td>$45</td>
-                <td class="not-available">No</td>
-            </tr>
-            </tbody>
-        </table>
+    <div id="no-results" class="no-results hidden">
+        <p>No books found matching your search.</p>
     </div>
 
 </main>
+
+<script>
+    // 1. DETERMINE USER ROLE
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get('role'); // 'admin' or 'customer'
+    
+    // 2. CONFIGURE BACK BUTTON
+    const backLink = document.getElementById('back-link');
+    if (role === 'admin') {
+        backLink.href = 'admin.html';
+        backLink.innerText = 'Back to Dashboard';
+    } else {
+        // Default to customer
+        backLink.href = 'customer.html';
+        backLink.innerText = 'Back to Home';
+    }
+
+    // 3. BOOK DATA (Colors added for covers)
+    const booksDB = [
+        { id: 1, title: "Clean Code", author: "Robert C. Martin", price: "$30.00", category: "Technology", cover: "#2f6f4e" },
+        { id: 2, title: "The Pragmatic Programmer", author: "Andy Hunt", price: "$45.00", category: "Technology", cover: "#1e3a8a" }, /* Blue */
+        { id: 3, title: "Design Patterns", author: "Gang of Four", price: "$50.00", category: "Technology", cover: "#7f1d1d" }, /* Red */
+        { id: 4, title: "A Brief History of Time", author: "Stephen Hawking", price: "$15.00", category: "Science", cover: "#0f766e" }, /* Teal */
+        { id: 5, title: "The Great Gatsby", author: "F. Scott Fitzgerald", price: "$10.00", category: "Fiction", cover: "#eab308" } /* Gold */
+    ];
+
+    // 4. RENDER ON LOAD
+    window.onload = function() {
+        renderBooks(booksDB);
+    };
+
+    // 5. SEARCH LOGIC
+    function handleSearch(event) {
+        event.preventDefault();
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const category = document.getElementById('category-filter').value;
+
+        const filteredBooks = booksDB.filter(book => {
+            const matchesText = book.title.toLowerCase().includes(query) || 
+                                book.author.toLowerCase().includes(query);
+            const matchesCat = category === 'all' || book.category === category;
+            return matchesText && matchesCat;
+        });
+
+        renderBooks(filteredBooks);
+    }
+
+    // 6. RENDER CARDS (UPDATED FOR 3D BOOK)
+    function renderBooks(books) {
+        const grid = document.getElementById('results-area');
+        const noRes = document.getElementById('no-results');
+        
+        grid.innerHTML = ''; 
+
+        if (books.length === 0) {
+            noRes.style.display = 'block';
+            return;
+        } else {
+            noRes.style.display = 'none';
+        }
+
+        books.forEach(book => {
+            // Button Logic
+            let actionBtn = '';
+            if (role === 'admin') {
+                actionBtn = `<a href="update-book.html?id=${book.id}" class="card-btn admin">Edit Details</a>`;
+            } else {
+                actionBtn = `<button class="card-btn customer" onclick="addToCart('${book.title}')">Add to Cart</button>`;
+            }
+
+            const html = `
+                <div class="book-card">
+                    <div class="book-visual" style="background: ${book.cover}">
+                        <span>${book.title[0]}</span>
+                    </div>
+                    
+                    <div class="book-info">
+                        <h3>${book.title}</h3>
+                        <p class="author">${book.author}</p>
+                        <div class="price-row">
+                            <span class="price">${book.price}</span>
+                            <span class="tag">${book.category}</span>
+                        </div>
+                        ${actionBtn}
+                    </div>
+                </div>
+            `;
+            grid.innerHTML += html;
+        });
+    }
+
+    function addToCart(title) {
+        alert(title + " added to your cart!");
+    }
+</script>
 
 </body>
 </html>

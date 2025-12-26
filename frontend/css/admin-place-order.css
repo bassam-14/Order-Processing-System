@@ -1,89 +1,157 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
-}
+/* src/frontend/css/admin-place-order.css */
 
+/* 1. BACKGROUND - Dark Theme */
 body {
     min-height: 100vh;
-    background: linear-gradient(180deg, #0f1512, #1a2420);
+    background: var(--bg-gradient-dark);
     color: #f1f3f2;
 }
 
-/* TOP BAR */
+/* 2. TOPBAR */
 .topbar {
-    background: #0f1512;
+    background: var(--primary-dark);
+    color: #f1f3f2;
     padding: 18px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.logout {
-    color: #7fd1a3;
-    text-decoration: none;
-}
+.logout { color: #ff6b6b; text-decoration: none; font-size: 14px; }
+.logout:hover { text-decoration: underline; }
 
-/* MAIN */
+/* 3. CONTAINER */
 .container {
     display: flex;
     justify-content: center;
-    margin-top: 60px;
+    padding: 60px 20px;
 }
 
-.card {
-    width: 420px;
-    background: rgba(255,255,255,0.06);
-    padding: 30px;
+/* 4. MAIN CARD */
+.order-card {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.08); /* Dark Glass */
+    backdrop-filter: blur(12px);
     border-radius: 20px;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+    padding: 40px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
-.card h2 {
-    margin-bottom: 20px;
+.card-header { margin-bottom: 30px; text-align: center; }
+.card-header h2 { font-size: 24px; margin-bottom: 8px; }
+.subtitle { color: #d1d5db; font-size: 14px; }
+
+/* 5. BOOK DETAILS SECTION */
+.book-details {
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
-.info p,
-.status p {
-    margin-bottom: 8px;
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #d1d5db;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 8px;
+}
+.detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.label { opacity: 0.7; }
+.value { color: #f1f3f2; font-weight: 500; }
+.mono { font-family: "Courier New", monospace; letter-spacing: 0.5px; }
+
+/* 6. STOCK STATUS BOX */
+.stock-status-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
 }
 
-.warning {
-    color: #ffb4b4;
-    font-weight: 500;
-}
-
-.order-box {
-    margin: 20px 0;
-}
-
-.order-box label {
-    display: block;
-    margin-bottom: 6px;
-}
-
-.order-box input {
-    width: 100%;
-    padding: 10px;
+.status-item {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
     border-radius: 10px;
-    border: none;
-    background: #1f2937;
-    color: white;
+    text-align: center;
 }
 
-/* BUTTON */
-.action {
+.status-item .label { display: block; font-size: 12px; margin-bottom: 5px; }
+.status-item .number { font-size: 24px; font-weight: bold; }
+.number.critical { color: #ff6b6b; } /* Red for low stock */
+
+.status-message {
     width: 100%;
-    padding: 12px;
-    background: #2f6f4e;
-    border: none;
-    border-radius: 999px;
-    color: white;
-    font-size: 15px;
-    cursor: pointer;
+    font-size: 13px;
+    text-align: center;
+    padding: 8px;
+    border-radius: 6px;
 }
 
-.action:hover {
+.status-message.warning {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+/* 7. FORM INPUTS */
+.input-group { margin-bottom: 20px; }
+.input-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #d1d5db; }
+
+.qty-input {
+    width: 100%;
+    padding: 14px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.qty-input:focus {
+    background: rgba(255,255,255,0.2);
+    border-color: #7fd1a3;
+}
+
+/* 8. SUMMARY & BUTTON */
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(47, 111, 78, 0.15); /* Green tint */
+    border-radius: 10px;
+    border: 1px dashed rgba(47, 111, 78, 0.4);
+}
+
+.summary-row .cost { font-size: 18px; font-weight: bold; color: #7fd1a3; }
+
+.action-btn {
+    width: 100%;
+    padding: 14px;
+    background: #2f6f4e;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    transition: 0.2s;
+}
+
+.action-btn:hover {
     background: #3a805c;
+    transform: translateY(-2px);
 }

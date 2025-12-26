@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
@@ -14,29 +15,34 @@
 
 <main class="dashboard-grid">
 
-    <!-- BIG LEFT CARD -->
     <div class="card big">
         <h3>Add New Book</h3>
-        <p>Create a new book record with threshold.</p>
-        <a href="#" class="action">Open</a>
+        <p>Create a new book record, set prices, and define stock thresholds.</p>
+        <a href="add-book.html" class="action">Open</a>
     </div>
 
     <div class="card">
         <h3>Update Book</h3>
         <p>Modify book details or stock quantity.</p>
-        <a href="#" class="action">Open</a>
+        <a href="update-book.html" class="action">Open</a>
     </div>
 
     <div class="card">
         <h3>Confirm Orders</h3>
-        <p>Confirm publisher replenishment orders.</p>
-        <a href="#" class="action">Open</a>
+        <p>Confirm received shipments from publishers.</p>
+        <a href="confirm-orders.html" class="action">Open</a>
+    </div>
+
+    <div class="card">
+        <h3>Restock Books</h3>
+        <p>Place manual replenishment orders to publishers.</p>
+        <a href="place-order.html" class="action">Place Order</a>
     </div>
 
     <div class="card">
         <h3>Search Books</h3>
         <p>Search by ISBN, title, author, or category.</p>
-        <a href="search.html" class="action">Open</a>
+        <a href="search-books.html?role=admin" class="action">Open</a>
     </div>
 
     <div class="card">

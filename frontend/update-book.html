@@ -2,38 +2,186 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Update Book</title>
+    <title>Update Book Details</title>
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/update-book.css">
 </head>
 <body>
 
 <header class="topbar">
-    <h1>Update Book</h1>
-    <a href="admin-dashboard.html" class="logout">Back</a>
+    <h1>Update Book Details</h1>
+    <a href="#" class="logout" id="back-link">Back</a>
 </header>
 
-<main class="update-container">
+<main class="container">
 
-    <!-- Search Book -->
-    <div class="card">
-        <h2>Search Book</h2>
-        <input type="text" placeholder="Enter ISBN or Title">
-        <a href="#" class="action">Search</a>
+    <div id="search-section" class="card search-card hidden">
+        <h2>Find Book to Edit</h2>
+        <p class="subtitle">Enter the Title or ISBN of the book you want to update.</p>
+        
+        <form id="search-form-internal" onsubmit="handleFindBook(event)" class="find-form">
+            <input type="text" id="find-input" placeholder="e.g. Clean Code" required>
+            <button type="submit" class="action-btn">Find Book</button>
+        </form>
+        
+        <p id="error-msg" class="error">Book not found. Try searching for "Clean Code".</p>
     </div>
 
-    <!-- Update Book -->
-    <div class="card">
-        <h2>Update Book Information</h2>
+    <div id="edit-section" class="card edit-card hidden">
+        <div class="card-header">
+            <h2>Edit Book Details</h2>
+            <p class="subtitle">Update pricing, stock, or metadata.</p>
+        </div>
 
-        <input type="text" placeholder="Title">
-        <input type="text" placeholder="Author">
-        <input type="number" placeholder="Price">
-        <input type="number" placeholder="Quantity in Stock">
+        <form onsubmit="handleUpdate(event)">
+            
+            <div class="input-group">
+                <label>ISBN (Read Only)</label>
+                <input type="text" id="book-isbn" readonly 
+                       style="opacity: 0.6; cursor: not-allowed;">
+            </div>
 
-        <a href="#" class="action">Update Book</a>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Book Title</label>
+                    <input type="text" id="book-title" required minlength="2">
+                </div>
+                <div class="input-group">
+                    <label>Author</label>
+                    <input type="text" id="book-author" required minlength="2" oninput="noNumbers(this)">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Category</label>
+                    <select id="book-category">
+                        <option value="Technology">Technology</option>
+                        <option value="Science">Science</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="History">History</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Price ($)</label>
+                    <input type="number" id="book-price" step="0.01" min="0.01" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Current Stock Quantity</label>
+                <input type="number" id="book-stock" min="0" required>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="action-btn" id="save-btn">Update Record</button>
+            </div>
+        </form>
     </div>
 
 </main>
+
+<script>
+    // 1. MOCK DATABASE (Must match your Search Page data exactly)
+    const booksDB = [
+        { id: 1, isbn: "978-0132350884", title: "Clean Code", author: "Robert C. Martin", price: 30.00, stock: 15, category: "Technology" },
+        { id: 2, isbn: "978-0201616224", title: "The Pragmatic Programmer", author: "Andy Hunt", price: 45.00, stock: 8, category: "Technology" },
+        { id: 3, isbn: "978-0201633610", title: "Design Patterns", author: "Gang of Four", price: 50.00, stock: 20, category: "Technology" },
+        { id: 4, isbn: "978-0553380163", title: "A Brief History of Time", author: "Stephen Hawking", price: 15.00, stock: 5, category: "Science" },
+        { id: 5, isbn: "978-0743273565", title: "The Great Gatsby", author: "F. Scott Fitzgerald", price: 10.00, stock: 50, category: "Fiction" }
+    ];
+
+    // 2. CHECK URL
+    const params = new URLSearchParams(window.location.search);
+    const urlId = params.get('id'); 
+    const backLink = document.getElementById('back-link');
+
+    // 3. INITIALIZE PAGE
+    if (urlId) {
+        // CAME FROM SEARCH PAGE
+        backLink.href = 'search-books.html?role=admin';
+        backLink.innerText = 'Back to Search';
+        
+        // Hide Search, Show Edit
+        document.getElementById('search-section').style.display = 'none';
+        document.getElementById('edit-section').style.display = 'block';
+        
+        loadBookData(urlId); // Load by ID
+    } else {
+        // CAME FROM DASHBOARD
+        backLink.href = 'admin.html';
+        backLink.innerText = 'Back to Dashboard';
+        
+        // Show Search, Hide Edit
+        document.getElementById('search-section').style.display = 'block';
+        document.getElementById('edit-section').style.display = 'none';
+    }
+
+    // 4. LOAD DATA HELPER
+    function loadBookData(identifier) {
+        // Strict Comparison converted to Lowercase for flexibility
+        const book = booksDB.find(b => 
+            b.id == identifier || 
+            b.title.toLowerCase().trim() === identifier.toLowerCase().trim() ||
+            b.isbn === identifier.trim()
+        );
+
+        if (book) {
+            // Fill Fields
+            document.getElementById('book-isbn').value = book.isbn;
+            document.getElementById('book-title').value = book.title;
+            document.getElementById('book-author').value = book.author;
+            document.getElementById('book-price').value = book.price.toFixed(2);
+            document.getElementById('book-stock').value = book.stock;
+            document.getElementById('book-category').value = book.category;
+
+            // Switch Views
+            document.getElementById('search-section').style.display = 'none';
+            document.getElementById('edit-section').style.display = 'block';
+            document.getElementById('edit-section').classList.add('fade-in');
+            document.getElementById('error-msg').style.display = 'none';
+        } else {
+            // Show Error
+            document.getElementById('error-msg').style.display = 'block';
+        }
+    }
+
+    // 5. HANDLE SEARCH SUBMISSION (The part that was broken)
+    function handleFindBook(event) {
+        event.preventDefault(); // Stop reload
+        const query = document.getElementById('find-input').value;
+        if(query) {
+            loadBookData(query);
+        }
+    }
+
+    // 6. HANDLE UPDATE SIMULATION
+    function handleUpdate(event) {
+        event.preventDefault();
+        const btn = document.getElementById('save-btn');
+        
+        btn.disabled = true;
+        btn.innerText = "Updating...";
+        btn.style.opacity = "0.7";
+
+        setTimeout(() => {
+            btn.innerText = "Updated Successfully! \u2713";
+            btn.style.background = "#2f6f4e";
+
+            setTimeout(() => {
+                if (urlId) {
+                    window.location.href = "search-books.html?role=admin";
+                } else {
+                    window.location.href = "admin.html";
+                }
+            }, 1000);
+        }, 1500);
+    }
+
+    function noNumbers(input) {
+        input.value = input.value.replace(/[^a-zA-Z\s]/g, '');
+    }
+</script>
 
 </body>
 </html>
