@@ -1,0 +1,89 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #0f1512, #1a2420);
+    color: #f1f3f2;
+}
+
+/* TOP BAR */
+.topbar {
+    background: #0f1512;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logout {
+    color: #7fd1a3;
+    text-decoration: none;
+}
+
+/* MAIN */
+.container {
+    display: flex;
+    justify-content: center;
+    margin-top: 60px;
+}
+
+.card {
+    width: 420px;
+    background: rgba(255,255,255,0.06);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+}
+
+.card h2 {
+    margin-bottom: 20px;
+}
+
+.info p,
+.status p {
+    margin-bottom: 8px;
+}
+
+.warning {
+    color: #ffb4b4;
+    font-weight: 500;
+}
+
+.order-box {
+    margin: 20px 0;
+}
+
+.order-box label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.order-box input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #1f2937;
+    color: white;
+}
+
+/* BUTTON */
+.action {
+    width: 100%;
+    padding: 12px;
+    background: #2f6f4e;
+    border: none;
+    border-radius: 999px;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.action:hover {
+    background: #3a805c;
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Books</title>
+    <link rel="stylesheet" href="css/search-books.css">
+</head>
+<body>
+
+<header class="topbar">
+    <h1>Search Books</h1>
+    <a href="customer.html" class="logout">Back</a>
+</header>
+
+<main class="container">
+
+    <!-- SEARCH FILTERS -->
+    <div class="search-card">
+        <h2>Search Criteria</h2>
+
+        <div class="filters">
+            <input type="text" placeholder="ISBN">
+            <input type="text" placeholder="Title">
+            <input type="text" placeholder="Author">
+            <input type="text" placeholder="Publisher">
+
+            <select>
+                <option value="">Category</option>
+                <option>Science</option>
+                <option>Art</option>
+                <option>Religion</option>
+                <option>History</option>
+                <option>Geography</option>
+            </select>
+        </div>
+
+        <button class="action">Search</button>
+    </div>
+
+    <!-- RESULTS TABLE -->
+    <div class="results-card">
+        <h2>Search Results</h2>
+
+        <table class="results-table">
+            <thead>
+            <tr>
+                <th>ISBN</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Available</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>9780132350884</td>
+                <td>Clean Code</td>
+                <td>Robert C. Martin</td>
+                <td>Science</td>
+                <td>$30</td>
+                <td class="available">Yes</td>
+            </tr>
+            <tr>
+                <td>9780201633610</td>
+                <td>Design Patterns</td>
+                <td>GoF</td>
+                <td>Science</td>
+                <td>$45</td>
+                <td class="not-available">No</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+</body>
+</html>

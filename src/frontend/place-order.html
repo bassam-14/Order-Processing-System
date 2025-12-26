@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Place Order</title>
+    <link rel="stylesheet" href="css/admin-place-order.css">
+</head>
+<body>
+
+<header class="topbar">
+    <h1>Place Replenishment Order</h1>
+    <a href="admin.html" class="logout">Back</a>
+</header>
+
+<main class="container">
+
+    <div class="card">
+        <h2>Book Stock Information</h2>
+
+        <div class="info">
+            <p><strong>ISBN:</strong> 9780132350884</p>
+            <p><strong>Title:</strong> Clean Code</p>
+            <p><strong>Publisher:</strong> Pearson</p>
+        </div>
+
+        <div class="status">
+            <p><strong>Current Stock:</strong> 3</p>
+            <p><strong>Threshold:</strong> 5</p>
+            <p class="warning">Stock is below threshold</p>
+        </div>
+
+        <div class="order-box">
+            <label>Order Quantity</label>
+            <input type="text" value="10" readonly>
+        </div>
+
+        <button class="action">Place Order</button>
+    </div>
+
+</main>
+
+</body>
+</html>

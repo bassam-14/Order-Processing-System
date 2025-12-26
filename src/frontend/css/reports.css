@@ -1,0 +1,91 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* PAGE */
+body {
+    min-height: 100vh;
+    background: linear-gradient(
+        180deg,
+        #262E36 0%,
+        #1f242a 100%
+    );
+    color: #D3D1CE;
+}
+
+/* TOP BAR */
+.topbar {
+    background: #262E36;
+    color: #D3D1CE;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.logout {
+    color: #B3B7BA;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.logout:hover {
+    text-decoration: underline;
+}
+
+/* CONTAINER */
+.reports-container {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 40px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* REPORT CARD */
+.report-card {
+    background: #2f3640;
+    border-radius: 22px;
+    padding: 32px;
+
+    box-shadow:
+        0 20px 40px rgba(0,0,0,0.45);
+}
+
+.report-card h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #D3D1CE;
+}
+
+/* TABLE */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.report-table th,
+.report-table td {
+    padding: 16px;
+    text-align: left;
+}
+
+.report-table thead {
+    background: #6C6D74;    /* Après Ski */
+    color: white;
+}
+
+.report-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.report-table tbody tr:last-child {
+    border-bottom: none;
+}

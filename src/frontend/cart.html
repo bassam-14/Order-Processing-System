@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="css/cart.css">
+</head>
+<body>
+
+<header class="topbar">
+    <h1>My Cart</h1>
+    <a href="customer-dashboard.html" class="logout">Back</a>
+</header>
+
+<main class="cart-container">
+
+    <!-- Cart Table -->
+    <table class="cart-table">
+        <thead>
+        <tr>
+            <th>Book</th>
+            <th>Author</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Clean Code</td>
+            <td>Robert C. Martin</td>
+            <td>$30</td>
+            <td>1</td>
+            <td>$30</td>
+            <td><a href="#" class="remove-btn">Remove</a></td>
+        </tr>
+        <tr>
+            <td>Design Patterns</td>
+            <td>GoF</td>
+            <td>$45</td>
+            <td>2</td>
+            <td>$90</td>
+            <td><a href="#" class="remove-btn">Remove</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Cart Summary -->
+    <div class="cart-summary">
+        <p><strong>Total Items:</strong> 3</p>
+        <p><strong>Total Price:</strong> $120</p>
+        <a href="#" class="action">Checkout</a>
+    </div>
+
+</main>
+
+</body>
+</html>
