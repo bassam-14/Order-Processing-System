@@ -2,73 +2,204 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Reports</title>
+    <title>System Reports</title>
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/reports.css">
 </head>
 <body>
 
 <header class="topbar">
-    <h1>Reports</h1>
-    <a href="admin-dashboard.html" class="logout">Back</a>
+    <h1>System Reports</h1>
+    <a href="admin.html" class="logout">Back</a>
 </header>
 
 <main class="reports-container">
 
-    <!-- Sales Report -->
-    <section class="report-card">
-        <h2>Sales Report</h2>
-
-        <table class="report-table">
+    <section class="report-card full-width">
+        <div class="card-header">
+            <h2>Monthly Sales Report</h2>
+            <p class="subtitle">Total sales for the previous month (October 2025)</p>
+        </div>
+        <div class="stat-box">
+            <span class="currency">$</span>
+            <span class="amount">15,240.00</span>
+        </div>
+        <table class="data-table">
             <thead>
             <tr>
-                <th>Book</th>
-                <th>Sold Quantity</th>
-                <th>Total Revenue</th>
+                <th>Category</th>
+                <th>Books Sold</th>
+                <th>Revenue</th>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td>Clean Code</td>
-                <td>12</td>
-                <td>$360</td>
+                <td>Science</td>
+                <td>120</td>
+                <td>$3,600.00</td>
             </tr>
             <tr>
-                <td>Design Patterns</td>
-                <td>8</td>
-                <td>$360</td>
+                <td>History</td>
+                <td>85</td>
+                <td>$2,125.00</td>
+            </tr>
+             <tr>
+                <td>Art</td>
+                <td>45</td>
+                <td>$1,350.00</td>
             </tr>
             </tbody>
         </table>
     </section>
 
-    <!-- Top Customers Report -->
     <section class="report-card">
-        <h2>Top Customers</h2>
+        <h2>Daily Sales Lookup</h2>
+        <p class="subtitle">View total sales for a specific date.</p>
+        
+        <form onsubmit="handleDailySales(event)" class="search-form">
+            <input type="date" id="sales-date" required>
+            <button type="submit" class="action-btn small">View</button>
+        </form>
 
-        <table class="report-table">
+        <div id="daily-result" class="result-box hidden">
+            <p>Total Sales on <span id="display-date" style="color:white">...</span>:</p>
+            <strong class="highlight-green" id="display-amount">$0.00</strong>
+        </div>
+    </section>
+
+    <section class="report-card">
+        <h2>Replenishment Stats</h2>
+        <p class="subtitle">Check how many times a book was re-ordered.</p>
+        
+        <form onsubmit="handleReplenishSearch(event)" class="search-form">
+            <input type="text" id="book-search" placeholder="Enter Book Title or ISBN" required>
+            <button type="submit" class="action-btn small">Search</button>
+        </form>
+
+        <div id="replenish-result" class="result-box hidden">
+            <p>Book: <span id="r-book" style="color:white">...</span></p>
+            <p>Times Ordered by Admin: <strong class="highlight-blue" id="r-count">0</strong></p>
+        </div>
+    </section>
+
+    <section class="report-card">
+        <h2>Top 5 Customers</h2>
+        <p class="subtitle">Best customers (Last 3 Months)</p>
+        <table class="data-table">
             <thead>
             <tr>
-                <th>Customer Name</th>
-                <th>Total Orders</th>
+                <th>Rank</th>
+                <th>Customer</th>
                 <th>Total Spent</th>
             </tr>
             </thead>
             <tbody>
             <tr>
+                <td>1</td>
                 <td>John Doe</td>
-                <td>5</td>
-                <td>$420</td>
+                <td>$420.00</td>
             </tr>
             <tr>
-                <td>Jane Smith</td>
+                <td>2</td>
+                <td>Sarah Smith</td>
+                <td>$350.50</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Michael Brown</td>
+                <td>$210.00</td>
+            </tr>
+            <tr>
                 <td>4</td>
-                <td>$300</td>
+                <td>Emily White</td>
+                <td>$180.00</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>David Lee</td>
+                <td>$150.00</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="report-card">
+        <h2>Top Selling Books</h2>
+        <p class="subtitle">Highest quantity sold (Last 3 Months)</p>
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Book Title</th>
+                <th>Sold</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>1</td>
+                <td>Clean Code</td>
+                <td>45</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>The Pragmatic Programmer</td>
+                <td>38</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Intro to Algorithms</td>
+                <td>30</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Design Patterns</td>
+                <td>22</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Artificial Intelligence</td>
+                <td>18</td>
             </tr>
             </tbody>
         </table>
     </section>
 
 </main>
+
+<script>
+    // 1. Handle Daily Sales Search
+    function handleDailySales(event) {
+        event.preventDefault();
+        const dateInput = document.getElementById('sales-date').value;
+        if(!dateInput) return;
+
+        // Simulate Random Sales Data
+        const randomTotal = (Math.random() * 1000).toFixed(2);
+        
+        document.getElementById('display-date').innerText = dateInput;
+        document.getElementById('display-amount').innerText = "$" + randomTotal;
+        
+        const resultBox = document.getElementById('daily-result');
+        resultBox.classList.remove('hidden');
+        resultBox.classList.add('fade-in');
+    }
+
+    // 2. Handle Replenishment Search
+    function handleReplenishSearch(event) {
+        event.preventDefault();
+        const query = document.getElementById('book-search').value;
+        
+        // Simulate Random Count (1 to 10)
+        const randomCount = Math.floor(Math.random() * 10) + 1;
+
+        document.getElementById('r-book').innerText = query;
+        document.getElementById('r-count').innerText = randomCount + " times";
+
+        const resultBox = document.getElementById('replenish-result');
+        resultBox.classList.remove('hidden');
+        resultBox.classList.add('fade-in');
+    }
+</script>
 
 </body>
 </html>

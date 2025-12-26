@@ -1,91 +1,169 @@
-/* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
-}
+/* src/frontend/css/orders.css */
 
-/* PAGE */
+/* --- (Keep all your existing CSS above this line) --- */
+
+/* 1. BACKGROUND - Dark Theme */
 body {
     min-height: 100vh;
-    background: linear-gradient(
-        180deg,
-        #D3D1CE 0%,      /* Arctic */
-        #B3B7BA 100%     /* Slopes */
-    );
-    color: #262E36;
+    background: var(--bg-gradient-dark);
+    color: #f1f3f2;
 }
 
-/* TOP BAR */
+/* 2. TOPBAR */
 .topbar {
-    background: #6C6D74;            /* Après Ski */
-    color: #ffffff;
+    background: var(--primary-dark);
+    color: #f1f3f2;
     padding: 18px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.logout {
-    color: #D3D1CE;
-    text-decoration: none;
-    font-size: 14px;
-}
+.logout { color: #7fd1a3; text-decoration: none; font-size: 14px; }
+.logout:hover { text-decoration: underline; }
 
-.logout:hover {
-    text-decoration: underline;
-}
-
-/* CONTAINER */
+/* 3. CONTAINER */
 .orders-container {
     max-width: 1100px;
-    margin: 50px auto;
+    margin: 60px auto;
     padding: 0 40px;
 }
 
-/* TABLE */
+/* 4. CARD WRAPPER */
+.orders-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.orders-card h2 { font-size: 22px; margin-bottom: 6px; }
+.subtitle { color: #d1d5db; font-size: 14px; margin-bottom: 24px; }
+
+/* 5. TABLE */
 .orders-table {
     width: 100%;
     border-collapse: collapse;
-    background: #D3D1CE;
-    border-radius: 20px;
-    overflow: hidden;
-
-    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
 }
 
 .orders-table th,
 .orders-table td {
-    padding: 16px;
+    padding: 18px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: #f1f3f2;
+    font-size: 15px;
 }
 
 .orders-table thead {
-    background: #6C6D74;
-    color: white;
-}
-
-.orders-table tbody tr {
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-}
-
-.orders-table tbody tr:last-child {
-    border-bottom: none;
-}
-
-/* STATUS */
-.status {
+    background: rgba(0,0,0,0.2);
+    color: #7fd1a3;
     font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.status.delivered {
-    color: #2f6f4e;
+.orders-table tbody tr:last-child td { border-bottom: none; }
+
+.id-col { font-family: "Courier New", monospace; color: #7fd1a3; }
+.items-col { color: #d1d5db; max-width: 300px; }
+.price-col { font-weight: bold; color: #f1f3f2; }
+
+/* 6. STATUS BADGES */
+.badge {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
 }
 
-.status.processing {
-    color: #6C6D74;
+.status-delivered {
+    background: rgba(47, 111, 78, 0.2);
+    color: #7fd1a3;
+    border: 1px solid rgba(47, 111, 78, 0.4);
 }
 
-.status.cancelled {
-    color: #8b3a3a;
+.status-processing {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.status-cancelled {
+    background: rgba(139, 58, 58, 0.2);
+    color: #ff6b6b;
+    border: 1px solid rgba(139, 58, 58, 0.4);
+}
+
+/* 7. VIEW BUTTON (Now clickable) */
+.view-btn {
+    font-size: 13px;
+    color: #d1d5db;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-btn:hover {
+    background: #7fd1a3;
+    color: #0f1512;
+    border-color: #7fd1a3;
+}
+
+/* --- NEW MODAL STYLES --- */
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); /* Dim background */
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-window {
+    background: #1f242a; /* Dark Solid Background */
+    width: 400px;
+    padding: 30px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    position: relative;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px; right: 20px;
+    background: none;
+    border: none;
+    color: #d1d5db;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.close-btn:hover { color: #ff6b6b; }
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #d1d5db;
 }

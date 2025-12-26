@@ -3,53 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <title>My Orders</title>
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/orders.css">
 </head>
 <body>
 
 <header class="topbar">
-    <h1>My Orders</h1>
+    <h1>My Order History</h1>
     <a href="customer.html" class="logout">Back</a>
 </header>
 
 <main class="orders-container">
 
-    <table class="orders-table">
-        <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Date</th>
-            <th>Items</th>
-            <th>Total Price</th>
-            <th>Status</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>#1023</td>
-            <td>15 May 2025</td>
-            <td>3</td>
-            <td>$120</td>
-            <td class="status delivered">Delivered</td>
-        </tr>
-        <tr>
-            <td>#1028</td>
-            <td>20 May 2025</td>
-            <td>1</td>
-            <td>$45</td>
-            <td class="status processing">Processing</td>
-        </tr>
-        <tr>
-            <td>#1031</td>
-            <td>25 May 2025</td>
-            <td>2</td>
-            <td>$60</td>
-            <td class="status cancelled">Cancelled</td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="orders-card">
+        <h2>Past Orders</h2>
+        <p class="subtitle">Track the status of your recent purchases.</p>
+
+        <table class="orders-table">
+            <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Date Placed</th>
+                <th>Books</th>
+                <th>Total Price</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="orders-list"></tbody>
+        </table>
+    </div>
 
 </main>
+
+<div class="modal-overlay" id="details-modal">
+    <div class="modal-window">
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+        
+        <h2 style="margin-bottom: 20px; color: #f1f3f2;">Order Details</h2>
+        
+        <div class="modal-info">
+            <div class="info-row">
+                <span>Order ID:</span>
+                <strong id="m-id" style="color: #7fd1a3;">...</strong>
+            </div>
+            <div class="info-row">
+                <span>Date:</span>
+                <strong id="m-date">...</strong>
+            </div>
+            <div class="info-row">
+                <span>Status:</span>
+                <strong id="m-status">...</strong>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+        <h3 style="font-size: 16px; margin-bottom: 10px; color: #d1d5db;">Items Purchased</h3>
+        <ul id="m-items-list" style="list-style: none; padding: 0; margin-bottom: 20px; color: #f1f3f2;">
+            </ul>
+
+        <div class="info-row total-row" style="font-size: 18px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <span>Total Paid:</span>
+            <strong id="m-total" style="color: #7fd1a3;">...</strong>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Database
+    const myOrders = [
+        { id: "1042", date: "Oct 26, 2025", items: "Clean Code, Design Patterns", total: "$120.00", status: "Processing" },
+        { id: "1023", date: "Sep 15, 2025", items: "Intro to Algorithms", total: "$60.00", status: "Delivered" },
+        { id: "0998", date: "Aug 22, 2025", items: "The Pragmatic Programmer", total: "$45.00", status: "Cancelled" }
+    ];
+
+    // 2. Render Table
+    window.onload = function() {
+        const tableBody = document.getElementById('orders-list');
+        let html = '';
+
+        myOrders.forEach(order => {
+            let statusClass = 'status-processing';
+            if (order.status === 'Delivered') statusClass = 'status-delivered';
+            if (order.status === 'Cancelled') statusClass = 'status-cancelled';
+
+            html += `
+                <tr>
+                    <td class="id-col">#${order.id}</td>
+                    <td>${order.date}</td>
+                    <td class="items-col">${order.items}</td>
+                    <td class="price-col">${order.total}</td>
+                    <td><span class="badge ${statusClass}">${order.status}</span></td>
+                    <td>
+                        <button class="view-btn" onclick="openModal('${order.id}')">View Details</button>
+                    </td>
+                </tr>
+            `;
+        });
+        tableBody.innerHTML = html;
+    };
+
+    // 3. Modal Logic
+    function openModal(id) {
+        // Find the order data
+        const order = myOrders.find(o => o.id === id);
+        
+        // Fill the modal text
+        document.getElementById('m-id').innerText = '#' + order.id;
+        document.getElementById('m-date').innerText = order.date;
+        document.getElementById('m-status').innerText = order.status;
+        document.getElementById('m-total').innerText = order.total;
+
+        // Fill the items list
+        const list = document.getElementById('m-items-list');
+        list.innerHTML = ''; // Clear old items
+        const itemsArray = order.items.split(', '); // Split "Book A, Book B" into array
+        
+        itemsArray.forEach(book => {
+            list.innerHTML += `<li style="padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">${book}</li>`;
+        });
+
+        // Show Modal
+        document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('details-modal').style.display = 'none';
+    }
+
+    // Close if clicking outside the window
+    window.onclick = function(event) {
+        const modal = document.getElementById('details-modal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>
 
 </body>
 </html>

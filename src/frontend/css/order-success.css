@@ -1,63 +1,144 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
-}
+/* src/frontend/css/order-success.css */
 
+/* 1. BACKGROUND - Dark Theme */
 body {
     min-height: 100vh;
-    background: linear-gradient(
-        180deg,
-        #D3D1CE,
-        #B3B7BA
-    );
+    background: var(--bg-gradient-dark);
+    color: #f1f3f2;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #262E36;
+    font-family: "Segoe UI", Arial, sans-serif;
 }
 
+/* 2. CARD */
 .success-card {
-    background: #D3D1CE;
-    padding: 40px;
+    background: rgba(255, 255, 255, 0.08); /* Dark Glass */
+    backdrop-filter: blur(12px);
+    
+    width: 100%;
+    max-width: 480px;
+    padding: 50px 40px;
     border-radius: 24px;
-    width: 420px;
+    
     text-align: center;
-    box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.05);
+    
+    /* Slight fade-in animation for the whole card */
+    animation: fadeIn 0.8s ease-out;
 }
 
-.success-card h1 {
-    margin-bottom: 12px;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.success-card p {
-    margin-bottom: 16px;
-    color: #6C6D74;
+/* 3. ICON ANIMATION */
+.icon-circle {
+    width: 90px; height: 90px;
+    background: rgba(47, 111, 78, 0.2); /* Transparent Green */
+    border: 3px solid #7fd1a3;
+    color: #7fd1a3;
+    border-radius: 50%;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 30px auto;
+    
+    /* Pop animation */
+    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.details p {
-    margin-bottom: 6px;
+.checkmark {
+    font-size: 45px;
+    font-weight: bold;
 }
 
-.action {
-    display: block;
-    margin-top: 20px;
-    padding: 12px;
-    background: #6C6D74;
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* 4. TEXT */
+h1 {
+    font-size: 26px;
+    margin-bottom: 10px;
+    color: #f1f3f2;
+}
+
+.subtitle {
+    color: #d1d5db;
+    font-size: 15px;
+    margin-bottom: 30px;
+}
+
+/* 5. DETAILS BOX */
+.details-box {
+    background: rgba(0,0,0,0.2); /* Darker inner box */
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 14px;
+    color: #d1d5db;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-row strong {
+    color: #f1f3f2;
+    font-weight: 600;
+}
+
+.highlight {
+    color: #7fd1a3 !important; /* Green text for money */
+    font-size: 16px;
+}
+
+/* 6. BUTTONS */
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 14px;
+    background: #2f6f4e;
     color: white;
     border-radius: 999px;
     text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
 }
 
-.action:hover {
-    background: #262E36;
+.action-btn:hover {
+    background: #3a805c;
+    transform: translateY(-2px);
 }
 
-.secondary {
-    display: block;
-    margin-top: 10px;
+.secondary-link {
+    color: #d1d5db;
     font-size: 14px;
-    color: #262E36;
+    text-decoration: none;
+    margin-top: 5px;
+}
+
+.secondary-link:hover {
+    color: #7fd1a3;
     text-decoration: underline;
 }

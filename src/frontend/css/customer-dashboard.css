@@ -1,3 +1,5 @@
+/* src/frontend/css/customer-dashboard.css */
+
 /* RESET */
 * {
     margin: 0;
@@ -6,21 +8,23 @@
     font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* PAGE — DARKER BASE (ADMIN-LIKE) */
+/* PAGE - Matches Admin Dark Theme */
 body {
     min-height: 100vh;
     background: linear-gradient(
         180deg,
-        #262E36 0%,      /* Admin dark */
-        #1f242a 100%
+        #0f1512 0%,
+        #141c18 60%,
+        #1a2420 100%
     );
-    color: #D3D1CE;      /* Arctic */
+    color: #f1f3f2;
 }
 
-/* ================= TOP BAR ================= */
+
+/* TOP BAR */
 .topbar {
-    background: #262E36;             /* SAME AS ADMIN */
-    color: #D3D1CE;
+    background: #0f1512;
+    color: #f1f3f2;
     padding: 18px 40px;
     display: flex;
     justify-content: space-between;
@@ -34,7 +38,7 @@ body {
 }
 
 .logout {
-    color: #B3B7BA;                  /* Slopes */
+    color: #7fd1a3;
     text-decoration: none;
     font-size: 14px;
 }
@@ -43,150 +47,128 @@ body {
     text-decoration: underline;
 }
 
-/* ================= PAGE CONTAINER ================= */
-.page-container {
-    max-width: 1100px;
-    margin: 50px auto;
-    padding: 0 60px;
-}
-
-/* ================= DASHBOARD GRID ================= */
+/* DASHBOARD GRID - Exact Admin Layout */
 .dashboard-grid {
-    max-width: 1100px;
-    margin: 50px auto;
+    max-width: 1400px;
+    margin: 100px auto;
     padding: 0 60px;
 
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 230px;
-    gap: 40px;
+    /* Big card on left, others on right */
+    grid-template-columns: 1.6fr 1fr 1fr;
+    grid-auto-rows: minmax(260px, auto);
+    gap: 48px;
+
+    justify-content: center;
+    align-items: center;
 }
 
-/* ================= CARD ================= */
+/* CARDS */
 .card {
-    background: #2f3640;             /* DARK CARD */
-    border-radius: 24px;
-    padding: 36px;
+    position: relative;
+    border-radius: 22px;
+    padding: 30px;
+    min-height: 280px;
+
+    background-color: #2f3640; /* Fallback */
+    background-size: cover;
+    background-position: center;
+
+    box-shadow:
+        0 22px 44px rgba(0,0,0,0.5),
+        0 8px 18px rgba(0,0,0,0.35);
 
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 14px;
+    justify-content: space-between;
 
-    box-shadow: 0 18px 36px rgba(0,0,0,0.45);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
 }
 
-.card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 22px 44px rgba(0,0,0,0.55);
+/* DARK OVERLAY */
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.48);
+    z-index: 0;
 }
 
-/* ================= TEXT ================= */
-.card h3,
-.section-title {
+/* CONTENT ABOVE OVERLAY */
+.card > * {
+    position: relative;
+    z-index: 1;
+    color: #f1f3f2;
+}
+
+/* BIG CARD (Browse Books) */
+.card.big {
+    grid-row: span 2;
+    min-height: 600px;
+}
+
+/* TEXT */
+.card h3 {
     font-size: 18px;
     font-weight: 600;
-    color: #D3D1CE;
+    margin-bottom: 12px;
 }
 
-.card p,
-.muted-text {
-    font-size: 14px;
-    color: #B3B7BA;
-    line-height: 1.5;
+.card p {
+    font-size: 15px;
+    color: #d1d5db;
+    line-height: 1.6;
 }
 
-/* ================= BUTTON ================= */
+/* ACTION BUTTON - Original Green Gradient */
 .action {
-    margin-top: 16px;
     align-self: flex-start;
-
-    padding: 10px 22px;
-    background: #6C6D74;             /* Après Ski */
-    color: #ffffff;
-    border-radius: 999px;
+    padding: 12px 22px;
+    background: linear-gradient(
+        135deg,
+        #2f6f4e,
+        #265c41
+    );
+    color: white;
+    border-radius: 12px;
     text-decoration: none;
     font-size: 14px;
-    font-weight: 500;
-
-    transition: background 0.2s ease, transform 0.15s ease;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.3);
 }
 
 .action:hover {
-    background: #262E36;
-    transform: translateY(-2px);
+    background: linear-gradient(
+        135deg,
+        #3a805c,
+        #2f6f4e
+    );
 }
 
-/* ================= TABLE (Cart / Orders / Search Results) ================= */
-.table-wrapper {
-    background: #2f3640;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 16px 32px rgba(0,0,0,0.45);
+/* BACKGROUND IMAGES - Mapped to Customer Features */
+.card.big {
+    /* 1. Browse Books */
+    background-image: url("../images/search.jpg");
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+.card:nth-of-type(2) {
+    /* 2. Cart */
+    background-image: url("../images/add.jpg");
 }
 
-thead {
-    background: #6C6D74;
-    color: #ffffff;
+.card:nth-of-type(3) {
+    /* 3. Orders */
+    background-image: url("../images/confirm.jpg");
 }
 
-th, td {
-    padding: 16px;
-    text-align: left;
-    font-size: 14px;
-    color: #D3D1CE;
+.card:nth-of-type(4) {
+    /* 4. Profile */
+    background-image: url("../images/update.jpg");
 }
 
-tbody tr {
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-
-tbody tr:last-child {
-    border-bottom: none;
-}
-
-/* ================= FORM ================= */
-.form-card {
-    background: #2f3640;
-    border-radius: 24px;
-    padding: 36px;
-    box-shadow: 0 16px 32px rgba(0,0,0,0.45);
-}
-
-input, select {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: none;
-    background: #1f242a;
-    color: #D3D1CE;
-    margin-top: 8px;
-    font-size: 14px;
-}
-
-input::placeholder {
-    color: #6C6D74;
-}
-
-/* ================= RESPONSIVE ================= */
+/* Responsive */
 @media (max-width: 900px) {
     .dashboard-grid {
         grid-template-columns: 1fr;
-        grid-auto-rows: auto;
         padding: 0 30px;
-    }
-
-    .page-container {
-        padding: 0 30px;
-    }
-
-    .topbar {
-        padding: 16px 24px;
     }
 }

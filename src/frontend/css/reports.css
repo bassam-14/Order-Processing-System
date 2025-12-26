@@ -1,26 +1,16 @@
-/* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
-}
+/* src/frontend/css/reports.css */
 
-/* PAGE */
+/* 1. BACKGROUND */
 body {
     min-height: 100vh;
-    background: linear-gradient(
-        180deg,
-        #262E36 0%,
-        #1f242a 100%
-    );
-    color: #D3D1CE;
+    background: var(--bg-gradient-dark);
+    color: #f1f3f2;
 }
 
-/* TOP BAR */
+/* 2. TOPBAR */
 .topbar {
-    background: #262E36;
-    color: #D3D1CE;
+    background: var(--primary-dark);
+    color: #f1f3f2;
     padding: 18px 40px;
     display: flex;
     justify-content: space-between;
@@ -28,64 +18,128 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.logout {
-    color: #B3B7BA;
-    text-decoration: none;
-    font-size: 14px;
-}
+.logout { color: #7fd1a3; text-decoration: none; font-size: 14px; }
+.logout:hover { text-decoration: underline; }
 
-.logout:hover {
-    text-decoration: underline;
-}
-
-/* CONTAINER */
+/* 3. GRID CONTAINER */
 .reports-container {
     max-width: 1200px;
     margin: 60px auto;
     padding: 0 40px;
+    
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    gap: 30px;
+}
 
+/* 4. REPORT CARDS */
+.report-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.05);
     display: flex;
     flex-direction: column;
-    gap: 40px;
 }
 
-/* REPORT CARD */
-.report-card {
-    background: #2f3640;
-    border-radius: 22px;
-    padding: 32px;
-
-    box-shadow:
-        0 20px 40px rgba(0,0,0,0.45);
+/* Make the first card (Monthly Sales) span both columns */
+.report-card.full-width {
+    grid-column: span 2;
+    flex-direction: row; /* Layout side-by-side for big card */
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.report-card h2 {
-    font-size: 20px;
-    margin-bottom: 20px;
-    color: #D3D1CE;
-}
+/* Card Header Text */
+.report-card h2 { font-size: 20px; margin-bottom: 5px; color: #f1f3f2; }
+.subtitle { color: #d1d5db; font-size: 13px; margin-bottom: 20px; }
 
-/* TABLE */
-.report-table {
+/* 5. BIG STAT BOX (For Monthly Sales) */
+.stat-box {
+    text-align: center;
+    margin-right: 40px;
+}
+.stat-box .currency { font-size: 24px; color: #7fd1a3; vertical-align: top; }
+.stat-box .amount { font-size: 48px; font-weight: bold; color: white; }
+
+/* 6. DATA TABLES */
+.data-table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 10px;
 }
 
-.report-table th,
-.report-table td {
-    padding: 16px;
+.data-table th {
     text-align: left;
+    color: #7fd1a3;
+    font-size: 13px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 0;
 }
 
-.report-table thead {
-    background: #6C6D74;    /* Après Ski */
+.data-table td {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 14px;
+    color: #d1d5db;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+
+/* 7. SEARCH FORMS */
+.search-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
     color: white;
+    outline: none;
 }
 
-.report-table tbody tr {
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+.action-btn.small {
+    padding: 10px 20px;
+    background: #2f6f4e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.action-btn.small:hover { background: #3a805c; }
+
+/* 8. RESULT BOXES (Hidden by default) */
+.result-box {
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
-.report-table tbody tr:last-child {
-    border-bottom: none;
+.hidden { display: none; }
+.fade-in { animation: fadeIn 0.5s ease-out; display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.highlight-green { color: #7fd1a3; font-size: 24px; display: block; margin-top: 5px; }
+.highlight-blue { color: #7f9cd1; font-size: 24px; display: block; margin-top: 5px; }
+
+/* Responsive */
+@media (max-width: 900px) {
+    .reports-container { grid-template-columns: 1fr; }
+    .report-card.full-width { grid-column: span 1; flex-direction: column; text-align: center; }
+    .stat-box { margin: 0 0 20px 0; }
 }
