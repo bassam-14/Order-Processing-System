@@ -1,0 +1,88 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        linear-gradient(rgba(15,21,18,0.85), rgba(15,21,18,0.85)),
+        url("../images/books.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    width: 360px;
+    padding: 32px 28px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.login-card h1 {
+    color: #f1f3f2;
+    margin-bottom: 6px;
+}
+
+.subtitle {
+    color: #c9d1cc;
+    font-size: 14px;
+    margin-bottom: 22px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.15);
+    color: #f1f3f2;
+}
+
+input::placeholder {
+    color: #cfd8d3;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #2f6f4e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #265c41;
+}
+
+.small-text {
+    margin-top: 18px;
+    font-size: 13px;
+    color: #c9d1cc;
+}
+
+a {
+    color: #7fd1a3;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

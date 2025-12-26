@@ -1,0 +1,113 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* PAGE */
+body {
+    min-height: 100vh;
+    background: linear-gradient(
+        180deg,
+        #262E36 0%,      /* Dark base */
+        #1f242a 100%
+    );
+    color: #D3D1CE;      /* Arctic */
+}
+
+/* TOP BAR */
+.topbar {
+    background: #262E36;
+    color: #D3D1CE;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.logout {
+    color: #B3B7BA;      /* Slopes */
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.logout:hover {
+    text-decoration: underline;
+}
+
+/* CONTAINER */
+.profile-container {
+    max-width: 520px;
+    margin: 70px auto;
+    padding: 0 20px;
+}
+
+/* PROFILE CARD */
+.profile-card {
+    background: #2f3640;
+    border-radius: 22px;
+    padding: 36px;
+
+    box-shadow:
+        0 20px 40px rgba(0,0,0,0.45);
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.profile-card h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #D3D1CE;
+}
+
+/* FORM */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    color: #B3B7BA;
+}
+
+.form-group input {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+
+    background: #1f242a;
+    color: #D3D1CE;
+}
+
+.form-group input::placeholder {
+    color: #6C6D74;      /* Après Ski */
+}
+
+/* BUTTON */
+.action {
+    margin-top: 10px;
+    align-self: flex-start;
+
+    padding: 12px 26px;
+    background: #6C6D74; /* Après Ski */
+    color: #ffffff;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.action:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+}
