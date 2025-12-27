@@ -28,9 +28,17 @@ public class UserRepository {
     }
 
     public void update(User user) {
-        String sql = "UPDATE User SET first_name=?, last_name=?, email=?, address=?, password=? WHERE id=?";
-        jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getAddress(),
-                user.getPassword(), user.getId());
+        // IMPORTANT: Use backticks `User` because it is a reserved keyword in MySQL
+        String sql = "UPDATE `User` SET first_name=?, last_name=?, email=?, address=?, password=? WHERE id=?";
+        
+        jdbcTemplate.update(sql, 
+            user.getFirstName(), 
+            user.getLastName(), 
+            user.getEmail(), 
+            user.getAddress(), 
+            user.getPassword(), 
+            user.getId()
+        );
     }
 
     public User findById(int id) {

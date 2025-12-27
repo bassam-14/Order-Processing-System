@@ -1,75 +1,83 @@
 USE bookstore_db;
 
--- --------------------------------------------------------
--- 1. INSERT PUBLISHERS
--- --------------------------------------------------------
-INSERT INTO publisher (name, address) VALUES 
-('TechBooks Publishing', '123 Silicon Valley, CA'),
-('History House', '45 Old Town, London, UK'),
-('Artistic Minds', '789 Creative Blvd, Paris, France');
+-- 1. TURN OFF SAFETY TO ALLOW DELETIONS
+SET SQL_SAFE_UPDATES = 0;
+SET FOREIGN_KEY_CHECKS = 0;
 
--- Insert Publisher Phones (Child Table)
-INSERT INTO publisher_phone (publisher_id, phone_number) VALUES 
-(1, '123-456-7890'),
-(1, '098-765-4321'), -- TechBooks has two numbers
-(2, '44-20-7946-0958'),
-(3, '33-1-9876-5432');
+-- 2. CLEAR ALL TABLES
+TRUNCATE TABLE Publisher_Order;
+TRUNCATE TABLE Order_Item;
+TRUNCATE TABLE Customer_Order;
+TRUNCATE TABLE Shopping_Cart;
+TRUNCATE TABLE User_Phone;
+TRUNCATE TABLE User;
+TRUNCATE TABLE Book_Author;
+TRUNCATE TABLE Book;
+TRUNCATE TABLE Author;
+TRUNCATE TABLE Publisher_Phone;
+TRUNCATE TABLE Publisher;
 
--- --------------------------------------------------------
--- 2. INSERT AUTHORS
--- --------------------------------------------------------
-INSERT INTO author (name) VALUES 
-('Robert C. Martin'),
-('Yuval Noah Harari'),
-('Stephen Hawking'),
-('Leonardo da Vinci'),
-('Karen Armstrong');
+-- 3. PUBLISHERS
+INSERT INTO Publisher (id, name, address) VALUES 
+(1, 'Pearson', 'London, UK'),
+(2, 'O Reilly Media', 'California, USA'),
+(3, 'National Geographic', 'Washington, USA'),
+(4, 'Taschen', 'Cologne, Germany'),
+(5, 'Oxford Press', 'Oxford, UK');
 
--- --------------------------------------------------------
--- 3. INSERT BOOKS
--- (Note: Categories must match ENUM: 'Science', 'Art', 'Religion', 'History', 'Geography')
--- --------------------------------------------------------
-INSERT INTO book (isbn, title, publication_year, price, category, stock_quantity, threshold, publisher_id) VALUES 
-('978-0132350884', 'Clean Code', 2008, 45.00, 'Science', 20, 5, 1),
-('978-0062316097', 'Sapiens: A Brief History', 2011, 22.50, 'History', 15, 10, 2),
-('978-0553380163', 'A Brief History of Time', 1988, 18.00, 'Science', 8, 10, 1), -- Low stock (below threshold)
-('978-1400079988', 'Leonardo da Vinci', 2017, 35.00, 'Art', 12, 5, 3),
-('978-0307278038', 'A History of God', 1993, 19.99, 'Religion', 30, 5, 2),
-('978-0137081073', 'The Clean Coder', 2011, 40.00, 'Science', 25, 5, 1),
-('978-0199213117', 'Geography: A Very Short Introduction', 2008, 12.00, 'Geography', 50, 10, 2),
-('978-0714833552', 'The Story of Art', 1995, 55.00, 'Art', 5, 8, 3), -- Low stock
-('978-1846041242', 'Homo Deus', 2015, 24.00, 'History', 18, 5, 2),
-('978-0385504225', 'The Da Vinci Code', 2003, 15.00, 'Art', 100, 10, 1);
+-- 4. AUTHORS
+INSERT INTO Author (id, name) VALUES 
+(1, 'Robert C. Martin'),
+(2, 'Stephen Hawking'),
+(3, 'Vincent Van Gogh'),
+(4, 'Ibn Khaldun'),
+(5, 'Marco Polo');
 
--- --------------------------------------------------------
--- 4. LINK BOOKS TO AUTHORS (Many-to-Many)
--- --------------------------------------------------------
-INSERT INTO book_author (book_isbn, author_id) VALUES 
-('978-0132350884', 1), -- Clean Code -> Robert Martin
-('978-0137081073', 1), -- Clean Coder -> Robert Martin
-('978-0062316097', 2), -- Sapiens -> Harari
-('978-1846041242', 2), -- Homo Deus -> Harari
-('978-0553380163', 3), -- Brief History -> Hawking
-('978-1400079988', 4), -- Leonardo -> Leonardo (Biographical)
-('978-0307278038', 5), -- History of God -> Armstrong
-('978-0714833552', 4), -- Story of Art -> Leonardo (Hypothetical)
-('978-0385504225', 1); -- Da Vinci Code -> Robert Martin (Hypothetical)
+-- 5. BOOKS (STRICT CATEGORIES: SCIENCE, ART, RELIGION, HISTORY, GEOGRAPHY)
+INSERT INTO Book (isbn, title, publisher_id, publication_year, price, category, stock_quantity, threshold) VALUES 
+-- SCIENCE
+('978-013235088', 'Clean Code', 1, 2008, 40.00, 'SCIENCE', 15, 5),
+('978-055338016', 'A Brief History of Time', 1, 1988, 15.00, 'SCIENCE', 5, 5),
 
--- --------------------------------------------------------
--- 5. INSERT USERS (Admin and Customer)
--- Note: In a real app, passwords should be Hashed (e.g., bcrypt). 
--- For now, we use plain text '123456' to keep testing simple.
--- --------------------------------------------------------
+-- ART
+('978-383652877', 'Van Gogh: The Complete Paintings', 4, 2012, 60.00, 'ART', 8, 3),
+('978-071483355', 'The Story of Art', 4, 1995, 45.00, 'ART', 12, 4),
 
--- 1. The Admin User
-INSERT INTO users (username, password, first_name, last_name, email, role, address) VALUES 
-('admin_mohamed', '123456', 'Mohamed', 'Bassam', 'admin@bookstore.com', 'admin', 'Alexandria Engineering Faculty');
+-- HISTORY
+('978-069114788', 'The Muqaddimah', 5, 1377, 35.00, 'HISTORY', 20, 5),
+('978-014044913', 'The Histories', 5, 2003, 12.50, 'HISTORY', 10, 5),
 
--- 2. The Customer User
-INSERT INTO users (username, password, first_name, last_name, email, role, address) VALUES 
-('customer_jane', '123456', 'Jane', 'Doe', 'jane@gmail.com', 'customer', '123 Seaside Ave, Alexandria');
+-- GEOGRAPHY
+('978-014044057', 'The Travels of Marco Polo', 3, 1298, 18.00, 'GEOGRAPHY', 7, 2),
+('978-079226525', 'Atlas of the World', 3, 2020, 95.00, 'GEOGRAPHY', 4, 2),
 
--- Insert User Phones
-INSERT INTO user_phone (user_id, phone_number) VALUES 
-(1, '010-1234-5678'), -- Admin Phone
-(2, '012-9876-5432'); -- Customer Phone
+-- RELIGION
+('978-006065292', 'Mere Christianity', 2, 1952, 14.00, 'RELIGION', 25, 5),
+('978-019953595', 'The Varieties of Religious Experience', 5, 1902, 22.00, 'RELIGION', 6, 3);
+
+-- 6. LINK AUTHORS TO BOOKS
+INSERT INTO Book_Author (book_isbn, author_id) VALUES 
+('978-013235088', 1), -- Clean Code -> Robert Martin
+('978-055338016', 2), -- Hawking
+('978-383652877', 3), -- Van Gogh
+('978-069114788', 4), -- Ibn Khaldun
+('978-014044057', 5); -- Marco Polo
+
+-- 7. USERS
+INSERT INTO User (id, username, password, first_name, last_name, email, address, role) VALUES 
+(1, 'admin', 'admin123', 'System', 'Admin', 'admin@alexu.edu.eg', 'Faculty of Engineering', 'ADMIN'),
+(2, 'customer1', '12345678', 'John', 'Doe', 'john@example.com', '123 Main St', 'CUSTOMER'),
+(3, 'customer2', '12345678', 'Sarah', 'Smith', 'sarah@example.com', '456 Sea View', 'CUSTOMER');
+
+-- 8. ORDER HISTORY (For Reports)
+INSERT INTO Customer_Order (id, user_id, order_date, total_price, credit_card_number, credit_card_expiry) VALUES 
+(101, 2, DATE_SUB(NOW(), INTERVAL 1 MONTH), 40.00, '1111', '12/25'), -- John bought Science
+(102, 3, DATE_SUB(NOW(), INTERVAL 2 DAY), 60.00, '2222', '10/26');  -- Sarah bought Art
+
+INSERT INTO Order_Item (order_id, book_isbn, quantity, unit_price) VALUES 
+(101, '978-013235088', 1, 40.00),
+(102, '978-383652877', 1, 60.00);
+
+-- 9. RESTORE SAFETY
+SET FOREIGN_KEY_CHECKS = 1;
+SET SQL_SAFE_UPDATES = 1;

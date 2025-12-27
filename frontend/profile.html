@@ -52,6 +52,13 @@
                 <input type="text" id="address" required>
             </div>
 
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            
+            <div class="input-group">
+                <label>New Password (Optional)</label>
+                <input type="password" id="pass-input" placeholder="Leave blank to keep current password" minlength="8">
+            </div>
+
             <div class="actions">
                 <button type="submit" class="action-btn" id="save-btn">Save Changes</button>
             </div>
@@ -79,39 +86,57 @@
 
     // 2. Handle Save
     async function handleSave(event) {
-        event.preventDefault();
+        event.preventDefault(); // Stop page reload
+        
         const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user) { window.location.href = 'login.html'; return; }
 
-        // Prepare updated object (Combine old user data with new inputs)
+        const btn = document.getElementById('save-btn');
+        const originalText = btn.innerText;
+
+        // 1. Prepare Data
         const updatedUser = {
             ...user, // Keep ID, Role, etc.
+            username: user.username, 
             email: document.getElementById('email').value,
             firstName: document.getElementById('fname').value,
             lastName: document.getElementById('lname').value,
-            address: document.getElementById('address').value
+            address: document.getElementById('address').value,
+            // Only send password if user typed one
+            password: document.getElementById('pass-input').value || user.password 
         };
 
-        // Note: Ideally call PUT /api/users/{id} here.
-        // For this demo, we will simulate success and update localStorage.
-        
-        /* // Real Backend Call Example:
-        await fetch(`http://localhost:8080/api/users/${user.id}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(updatedUser)
-        });
-        */
+        try {
+            // 2. Visual Loading
+            btn.disabled = true;
+            btn.innerText = "Saving...";
 
-        // Update Browser Storage so the changes stick locally for the session
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            // 3. REAL BACKEND CALL
+            const response = await fetch(`http://localhost:8080/api/users/${user.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedUser)
+            });
 
-        const btn = document.getElementById('save-btn');
-        btn.innerText = "Saved Successfully! \u2713";
-        btn.style.background = "#2f6f4e";
-        
-        setTimeout(() => {
-            window.location.href = "customer.html";
-        }, 1000);
+            if (response.ok) {
+                // 4. Update Local Storage
+                localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+                btn.innerText = "Saved Successfully! \u2713";
+                btn.style.background = "#2f6f4e";
+                
+                setTimeout(() => {
+                    window.location.href = "customer.html";
+                }, 1000);
+            } else {
+                throw new Error("Update failed");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Failed to update profile. Check backend console.");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     }
 </script>
 

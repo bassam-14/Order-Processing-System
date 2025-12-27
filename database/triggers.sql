@@ -1,39 +1,34 @@
 DELIMITER //
 CREATE TRIGGER prevent_negative_stock
-BEFORE UPDATE ON book
+BEFORE UPDATE ON Book
 FOR EACH ROW
 BEGIN
     IF NEW.stock_quantity < 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Error: Stock quantity cannot be negative.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Stock cannot be negative';
     END IF;
 END;
 //
-DELIMITER ;
 
-DELIMITER //
-CREATE TRIGGER restock_level_check
-AFTER UPDATE ON book
+-- Trigger B: Auto-Order from Publisher when stock is low
+CREATE TRIGGER place_publisher_order
+AFTER UPDATE ON Book
 FOR EACH ROW
 BEGIN
+    -- If stock drops below threshold AND it wasn't below before (to prevent duplicate orders)
     IF NEW.stock_quantity < NEW.threshold AND OLD.stock_quantity >= OLD.threshold THEN
-        INSERT INTO publisher_order (book_isbn, quantity, status)
-        VALUES (NEW.isbn, 50, 'Pending'); -- Assumes fixed order quantity of 50
+        INSERT INTO Publisher_Order (book_isbn, quantity, status)
+        VALUES (NEW.isbn, 10, 'ORDERED'); -- Auto-order 10 copies
     END IF;
 END;
 //
-DELIMITER ;
 
-
-DELIMITER //
-CREATE TRIGGER confirm_publisher_order
-AFTER UPDATE ON publisher_order
+-- Trigger C: Restock when Admin confirms order
+CREATE TRIGGER confirm_order_restock
+AFTER UPDATE ON Publisher_Order
 FOR EACH ROW
 BEGIN
-    -- Only run if status changed to 'Confirmed'
-    IF NEW.status = 'Confirmed' AND OLD.status != 'Confirmed' THEN
-        UPDATE book
-        SET stock_quantity = stock_quantity + NEW.quantity
+    IF NEW.status = 'RECEIVED' AND OLD.status != 'RECEIVED' THEN
+        UPDATE Book SET stock_quantity = stock_quantity + NEW.quantity 
         WHERE isbn = NEW.book_isbn;
     END IF;
 END;

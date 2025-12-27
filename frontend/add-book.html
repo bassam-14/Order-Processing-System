@@ -1,119 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Add New Book</title>
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/add-book.css">
 </head>
+
 <body>
 
-<header class="topbar">
-    <h1>Add New Book</h1>
-    <a href="admin.html" class="logout">Back</a>
-</header>
+    <header class="topbar">
+        <h1>Add New Book</h1>
+        <a href="admin.html" class="logout">Back</a>
+    </header>
 
-<main class="form-container">
-    <form class="form-card" onsubmit="addBook(event)">
-        <h2>Book Details</h2>
-        <p class="subtitle">Enter the properties of the new book below.</p>
+    <main class="form-container">
+        <form class="form-card" onsubmit="addBook(event)">
+            <h2>Book Details</h2>
+            <p class="subtitle">Enter the properties of the new book below.</p>
 
-        <div class="grid-inputs">
-            <div class="input-group">
-                <label>ISBN Number</label>
-                <input type="text" id="isbn" placeholder="978-..." required>
+            <div class="grid-inputs">
+                <div class="input-group">
+                    <label>ISBN Number</label>
+                    <input type="text" id="isbn" placeholder="978-..." required>
+                </div>
+
+                <div class="input-group">
+                    <label>Category</label>
+                    <select id="category" required>
+                        <option value="">Select Category</option>
+                        <option value="SCIENCE">Science</option>
+                        <option value="ART">Art</option>
+                        <option value="RELIGION">Religion</option>
+                        <option value="HISTORY">History</option>
+                        <option value="GEOGRAPHY">Geography</option>
+                    </select>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Book Title</label>
+                    <input type="text" id="title" placeholder="e.g. Database Systems" required>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Author(s)</label>
+                    <input type="text" id="authors" placeholder="e.g. Elmasri" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Publisher</label>
+                    <input type="text" id="publisher" placeholder="e.g. Pearson" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Publication Year</label>
+                    <input type="number" id="year" placeholder="2025" min="1900" max="2100" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Selling Price ($)</label>
+                    <input type="number" id="price" placeholder="0.00" step="0.01" min="0.01" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Initial Stock</label>
+                    <input type="number" id="stock" placeholder="0" min="0" required>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Threshold (Minimum Quantity)</label>
+                    <input type="number" id="threshold" placeholder="e.g. 5" min="0" required>
+                    <small style="color: #B3B7BA; font-size: 12px;">System will auto-order when stock drops below
+                        this.</small>
+                </div>
             </div>
 
-            <div class="input-group">
-                <label>Category</label>
-                <select id="category" required>
-                    <option value="">Select Category</option>
-                    <option value="Science">Science</option>
-                    <option value="Art">Art</option>
-                    <option value="Religion">Religion</option>
-                    <option value="History">History</option>
-                    <option value="Geography">Geography</option>
-                </select>
-            </div>
+            <button type="submit" class="action-btn">Add Book</button>
+        </form>
+    </main>
 
-            <div class="input-group full-width">
-                <label>Book Title</label>
-                <input type="text" id="title" placeholder="e.g. Database Systems" required>
-            </div>
+    <script>
+        async function addBook(event) {
+            event.preventDefault();
 
-            <div class="input-group full-width">
-                <label>Author(s)</label>
-                <input type="text" id="authors" placeholder="e.g. Elmasri" required>
-            </div>
+            const bookData = {
+                isbn: document.getElementById('isbn').value,
+                title: document.getElementById('title').value,
+                category: document.getElementById('category').value,
+                // Note: Simplification for single author input. 
+                // If backend needs list, you might need extra logic here.
+                // Sending generic structure for now.
+                publisherId: 1, // You might need a way to look up publisher ID or send name
+                publicationYear: parseInt(document.getElementById('year').value),
+                price: parseFloat(document.getElementById('price').value),
+                stockQuantity: parseInt(document.getElementById('stock').value),
+                threshold: parseInt(document.getElementById('threshold').value)
+            };
 
-            <div class="input-group">
-                <label>Publisher</label>
-                <input type="text" id="publisher" placeholder="e.g. Pearson" required>
-            </div>
+            try {
+                const response = await fetch('http://localhost:8080/api/books', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookData)
+                });
 
-            <div class="input-group">
-                <label>Publication Year</label>
-                <input type="number" id="year" placeholder="2025" min="1900" max="2100" required>
-            </div>
-
-            <div class="input-group">
-                <label>Selling Price ($)</label>
-                <input type="number" id="price" placeholder="0.00" step="0.01" min="0.01" required>
-            </div>
-
-            <div class="input-group">
-                <label>Initial Stock</label>
-                <input type="number" id="stock" placeholder="0" min="0" required>
-            </div>
-
-            <div class="input-group full-width">
-                <label>Threshold (Minimum Quantity)</label>
-                <input type="number" id="threshold" placeholder="e.g. 5" min="0" required>
-                <small style="color: #B3B7BA; font-size: 12px;">System will auto-order when stock drops below this.</small>
-            </div>
-        </div>
-
-        <button type="submit" class="action-btn">Add Book</button>
-    </form>
-</main>
-
-<script>
-    async function addBook(event) {
-        event.preventDefault();
-
-        const bookData = {
-            isbn: document.getElementById('isbn').value,
-            title: document.getElementById('title').value,
-            category: document.getElementById('category').value,
-            // Note: Simplification for single author input. 
-            // If backend needs list, you might need extra logic here.
-            // Sending generic structure for now.
-            publisherId: 1, // You might need a way to look up publisher ID or send name
-            publicationYear: parseInt(document.getElementById('year').value),
-            price: parseFloat(document.getElementById('price').value),
-            stockQuantity: parseInt(document.getElementById('stock').value),
-            threshold: parseInt(document.getElementById('threshold').value)
-        };
-
-        try {
-            const response = await fetch('http://localhost:8080/api/books', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bookData)
-            });
-
-            if (response.ok) {
-                alert("Book Added Successfully!");
-                window.location.href = 'admin.html';
-            } else {
-                alert("Error adding book: " + await response.text());
+                if (response.ok) {
+                    alert("Book Added Successfully!");
+                    window.location.href = 'admin.html';
+                } else {
+                    alert("Error adding book: " + await response.text());
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Backend connection failed");
             }
-        } catch (error) {
-            console.error(error);
-            alert("Backend connection failed");
         }
-    }
-</script>
+    </script>
 
 </body>
+
 </html>

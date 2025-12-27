@@ -1,127 +1,98 @@
--- Create the Database
 CREATE DATABASE IF NOT EXISTS bookstore_db;
 USE bookstore_db;
 
--- Drop tables if they exist
-DROP TABLE IF EXISTS publisher_order;
-DROP TABLE IF EXISTS order_item;
-DROP TABLE IF EXISTS customer_order;
-DROP TABLE IF EXISTS shopping_cart;
-DROP TABLE IF EXISTS user_phone;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS book_author;
-DROP TABLE IF EXISTS author;
-DROP TABLE IF EXISTS book;
-DROP TABLE IF EXISTS publisher_phone;
-DROP TABLE IF EXISTS publisher;
-
--- Publisher Table
-CREATE TABLE publisher (
+-- 1. TABLES
+CREATE TABLE Publisher (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    address VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name VARCHAR(255) NOT NULL,
+    address VARCHAR(255)
 );
 
--- Publisher Phones
-CREATE TABLE publisher_phone (
+CREATE TABLE Publisher_Phone (
     publisher_id INT,
     phone_number VARCHAR(20),
     PRIMARY KEY (publisher_id, phone_number),
-    FOREIGN KEY (publisher_id) REFERENCES publisher(id) ON DELETE CASCADE
+    FOREIGN KEY (publisher_id) REFERENCES Publisher(id) ON DELETE CASCADE
 );
 
--- Author Table
-CREATE TABLE author (
+CREATE TABLE Author (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
+    name VARCHAR(255) NOT NULL
 );
 
--- Book Table
-CREATE TABLE book (
-    isbn VARCHAR(20) PRIMARY KEY,
+CREATE TABLE Book (
+    isbn VARCHAR(13) PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    publication_year INT,
-    price DECIMAL(10, 2) NOT NULL,
-    category ENUM('Science', 'Art', 'Religion', 'History', 'Geography') NOT NULL,
-    stock_quantity INT DEFAULT 0,
-    threshold INT DEFAULT 10,
     publisher_id INT,
-    FOREIGN KEY (publisher_id) REFERENCES publisher(id) ON DELETE SET NULL,
-
-    -- Constraint: Stock cannot be negative 
-    CONSTRAINT chk_stock_non_negative CHECK (stock_quantity >= 0)
+    publication_year INT,
+    price DECIMAL(10,2),
+    category VARCHAR(50), -- Science, Art, Religion, History, Geography
+    stock_quantity INT DEFAULT 0,
+    threshold INT DEFAULT 5,
+    FOREIGN KEY (publisher_id) REFERENCES Publisher(id)
 );
 
--- Book_Author (Many-to-Many Relationship)
-CREATE TABLE book_author (
-    book_isbn VARCHAR(20),
+CREATE TABLE Book_Author (
+    book_isbn VARCHAR(13),
     author_id INT,
     PRIMARY KEY (book_isbn, author_id),
-    FOREIGN KEY (book_isbn) REFERENCES book(isbn) ON DELETE CASCADE,
-    FOREIGN KEY (author_id) REFERENCES author(id) ON DELETE CASCADE
+    FOREIGN KEY (book_isbn) REFERENCES Book(isbn),
+    FOREIGN KEY (author_id) REFERENCES Author(id)
 );
 
--- Users (Combines Admin and Customer)
-CREATE TABLE users (
+CREATE TABLE User (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL, -- In real app, use Hashing!
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100),
     address VARCHAR(255),
-    role ENUM('customer', 'admin') DEFAULT 'customer',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    role VARCHAR(20) -- CUSTOMER, ADMIN, MANAGER
 );
 
--- User Phones
-CREATE TABLE user_phone (
+CREATE TABLE User_Phone (
     user_id INT,
     phone_number VARCHAR(20),
     PRIMARY KEY (user_id, phone_number),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE
 );
 
-CREATE TABLE shopping_cart (
+CREATE TABLE Shopping_Cart (
     user_id INT,
-    book_isbn VARCHAR(20),
+    book_isbn VARCHAR(13),
     quantity INT DEFAULT 1,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, book_isbn),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (book_isbn) REFERENCES book(isbn) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (book_isbn) REFERENCES Book(isbn)
 );
 
--- Customer Order
-CREATE TABLE customer_order (
+CREATE TABLE Customer_Order (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    total_amount DECIMAL(10, 2) NOT NULL,
-    status ENUM('Pending', 'Completed', 'Cancelled') DEFAULT 'Pending',
+    total_price DECIMAL(10,2),
     credit_card_number VARCHAR(20),
     credit_card_expiry VARCHAR(5),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (user_id) REFERENCES User(id)
 );
 
--- Order Items
-CREATE TABLE order_item (
+CREATE TABLE Order_Item (
     order_id INT,
-    book_isbn VARCHAR(20),
-    quantity INT NOT NULL,
-    unit_price DECIMAL(10, 2) NOT NULL,
+    book_isbn VARCHAR(13),
+    quantity INT,
+    unit_price DECIMAL(10,2),
     PRIMARY KEY (order_id, book_isbn),
-    FOREIGN KEY (order_id) REFERENCES customer_order(id) ON DELETE CASCADE,
-    FOREIGN KEY (book_isbn) REFERENCES book(isbn)
+    FOREIGN KEY (order_id) REFERENCES Customer_Order(id),
+    FOREIGN KEY (book_isbn) REFERENCES Book(isbn)
 );
 
--- Publisher Order 
-CREATE TABLE publisher_order (
+CREATE TABLE Publisher_Order (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    book_isbn VARCHAR(20),
-    quantity INT NOT NULL, -- This is the constant quantity fixed
+    book_isbn VARCHAR(13),
+    quantity INT,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('Pending', 'Confirmed') DEFAULT 'Pending',
-    FOREIGN KEY (book_isbn) REFERENCES book(isbn) ON DELETE CASCADE
+    status VARCHAR(20), -- ORDERED, RECEIVED
+    FOREIGN KEY (book_isbn) REFERENCES Book(isbn)
 );

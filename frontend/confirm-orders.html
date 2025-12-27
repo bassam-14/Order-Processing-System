@@ -24,89 +24,79 @@
         <thead>
         <tr>
             <th>Order ID</th>
-            <th>Book Title</th>
-            <th>Publisher</th>
+            <th>Book ISBN</th>
             <th>Quantity</th>
-            <th>Date Placed</th>
             <th>Status</th>
             <th>Action</th>
         </tr>
         </thead>
-        <tbody>
-        <tr id="row-881">
-            <td class="id-col">#PO-881</td>
-            <td>Clean Code</td>
-            <td>Pearson</td>
-            <td class="qty-col">10</td>
-            <td>Oct 24, 2025</td>
-            <td><span class="badge pending">In Transit</span></td>
-            <td>
-                <button class="action-btn small" onclick="confirmOrder(this, 'row-881')">
-                    Confirm Receipt
-                </button>
-            </td>
-        </tr>
-
-        <tr id="row-882">
-            <td class="id-col">#PO-882</td>
-            <td>The Pragmatic Programmer</td>
-            <td>Addison-Wesley</td>
-            <td class="qty-col">15</td>
-            <td>Oct 25, 2025</td>
-            <td><span class="badge pending">In Transit</span></td>
-            <td>
-                <button class="action-btn small" onclick="confirmOrder(this, 'row-882')">
-                    Confirm Receipt
-                </button>
-            </td>
-        </tr>
-
-        <tr id="row-879" style="opacity: 0.6;">
-            <td class="id-col">#PO-879</td>
-            <td>Introduction to Algorithms</td>
-            <td>MIT Press</td>
-            <td class="qty-col">5</td>
-            <td>Oct 20, 2025</td>
-            <td><span class="badge success">Stocked</span></td>
-            <td>
-                <button class="action-btn small" disabled style="background: transparent; border: 1px solid #7fd1a3; cursor: default;">
-                    Completed
-                </button>
-            </td>
-        </tr>
-        </tbody>
+        <tbody id="orders-list">
+            </tbody>
     </table>
 
 </main>
 
 <script>
-    function confirmOrder(btn, rowId) {
-        // 1. Visual Loading State
-        const originalText = btn.innerText;
-        btn.innerText = "Updating...";
-        btn.style.opacity = "0.7";
-
-        // 2. Simulate Network Delay (0.5s) for realism
-        setTimeout(() => {
-            const row = document.getElementById(rowId);
-            const badge = row.querySelector('.badge');
-
-            // Change Badge to Green
-            badge.className = "badge success";
-            badge.innerText = "Stock Updated";
-
-            // Disable Button and Change Style
-            btn.disabled = true;
-            btn.innerText = "Confirmed ✓";
-            btn.style.background = "#2f6f4e";
-            btn.style.cursor = "default";
-            btn.style.opacity = "1";
+    // 1. Load All Orders
+    window.onload = async function() {
+        try {
+            const response = await fetch('http://localhost:8080/api/publisher-orders');
+            const orders = await response.json();
+            const tbody = document.getElementById('orders-list');
             
-            // Optional: Fade row slightly to show it's "done"
-            row.style.transition = "opacity 0.5s";
-            row.style.opacity = "0.8";
+            tbody.innerHTML = '';
 
-        }, 600);
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No active orders found.</td></tr>';
+                return;
+            }
+
+            orders.forEach(order => {
+                let actionHtml = '';
+                let statusClass = 'pending';
+
+                if (order.status === 'RECEIVED') {
+                    statusClass = 'success';
+                    actionHtml = `<button class="action-btn small" disabled style="opacity:0.5; cursor:default;">Completed</button>`;
+                } else {
+                    actionHtml = `<button class="action-btn small" onclick="confirmOrder(${order.id})">Confirm Receipt</button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="id-col">#${order.id}</td>
+                        <td>${order.bookIsbn}</td>
+                        <td class="qty-col">${order.quantity}</td>
+                        <td><span class="badge ${statusClass}">${order.status}</span></td>
+                        <td>${actionHtml}</td>
+                    </tr>
+                `;
+            });
+        } catch (e) {
+            console.error(e);
+            alert("Error loading orders.");
+        }
+    };
+
+    // 2. Handle Confirm Button
+    async function confirmOrder(orderId) {
+        if(!confirm("Confirm that these books have arrived? Stock will be updated.")) return;
+
+        try {
+            // Sends request to: PUT /api/publisher-orders/5/status?status=RECEIVED
+            const response = await fetch(`http://localhost:8080/api/publisher-orders/${orderId}/status?status=RECEIVED`, {
+                method: 'PUT'
+            });
+
+            if (response.ok) {
+                alert("Stock Updated Successfully!");
+                window.location.reload(); // Refresh to show new status
+            } else {
+                alert("Error updating status.");
+            }
+        } catch (e) {
+            alert("Network Error");
+        }
     }
 </script>
 

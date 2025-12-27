@@ -1,6 +1,6 @@
 /* src/frontend/css/admin-place-order.css */
 
-/* 1. BACKGROUND - Dark Theme */
+/* 1. BACKGROUND */
 body {
     min-height: 100vh;
     background: var(--bg-gradient-dark);
@@ -17,7 +17,6 @@ body {
     align-items: center;
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-
 .logout { color: #ff6b6b; text-decoration: none; font-size: 14px; }
 .logout:hover { text-decoration: underline; }
 
@@ -28,7 +27,7 @@ body {
     padding: 60px 20px;
 }
 
-/* 4. MAIN CARD */
+/* 4. MAIN CARD (Used for both Search & Order steps) */
 .order-card {
     width: 100%;
     max-width: 500px;
@@ -38,19 +37,50 @@ body {
     padding: 40px;
     box-shadow: 0 25px 50px rgba(0,0,0,0.5);
     border: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
 }
 
-.card-header { margin-bottom: 30px; text-align: center; }
-.card-header h2 { font-size: 24px; margin-bottom: 8px; }
-.subtitle { color: #d1d5db; font-size: 14px; }
+/* Utility Class for toggling views */
+.hidden { display: none; }
 
-/* 5. BOOK DETAILS SECTION */
+.order-card h2 { font-size: 24px; margin-bottom: 8px; }
+.subtitle { color: #d1d5db; font-size: 14px; margin-bottom: 25px; }
+
+/* --- 5. SEARCH STEP SPECIFIC (New Addition) --- */
+/* This makes the Input and Button sit side-by-side */
+#search-step .input-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 0; /* Remove default margin for this specific group */
+}
+
+#isbn-search {
+    flex: 1; /* Grow to fill space */
+    padding: 12px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: white;
+    outline: none;
+    font-size: 16px;
+}
+
+#search-step .action-btn {
+    width: auto; /* Don't stretch */
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0 25px;
+}
+
+/* --- 6. BOOK DETAILS SECTION (Order Step) --- */
 .book-details {
     background: rgba(0,0,0,0.2);
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 25px;
     border: 1px solid rgba(255,255,255,0.05);
+    text-align: left; /* Align text left for details */
 }
 
 .detail-row {
@@ -68,10 +98,9 @@ body {
 .value { color: #f1f3f2; font-weight: 500; }
 .mono { font-family: "Courier New", monospace; letter-spacing: 0.5px; }
 
-/* 6. STOCK STATUS BOX */
+/* 7. STOCK STATUS BOX */
 .stock-status-box {
     display: flex;
-    flex-wrap: wrap;
     gap: 15px;
     margin-bottom: 30px;
 }
@@ -82,29 +111,19 @@ body {
     padding: 15px;
     border-radius: 10px;
     text-align: center;
+    border: 1px solid transparent; /* Prepare for border color */
 }
 
-.status-item .label { display: block; font-size: 12px; margin-bottom: 5px; }
+/* Green border for current stock */
+.status-item:first-child { border-color: rgba(47, 111, 78, 0.5); }
+/* Orange border for threshold */
+.status-item:last-child { border-color: rgba(217, 119, 6, 0.5); }
+
+.status-item .label { display: block; font-size: 12px; margin-bottom: 5px; opacity: 0.8; }
 .status-item .number { font-size: 24px; font-weight: bold; }
-.number.critical { color: #ff6b6b; } /* Red for low stock */
 
-.status-message {
-    width: 100%;
-    font-size: 13px;
-    text-align: center;
-    padding: 8px;
-    border-radius: 6px;
-}
-
-.status-message.warning {
-    background: rgba(255, 193, 7, 0.15);
-    color: #ffc107;
-    border: 1px solid rgba(255, 193, 7, 0.3);
-}
-
-/* 7. FORM INPUTS */
-.input-group { margin-bottom: 20px; }
-.input-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #d1d5db; }
+/* 8. FORM INPUTS */
+.input-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #d1d5db; text-align: left; }
 
 .qty-input {
     width: 100%;
@@ -114,8 +133,10 @@ body {
     border-radius: 10px;
     color: white;
     font-size: 16px;
+    text-align: center;
     outline: none;
     transition: 0.2s;
+    box-sizing: border-box; /* Fix padding issue */
 }
 
 .qty-input:focus {
@@ -123,20 +144,7 @@ body {
     border-color: #7fd1a3;
 }
 
-/* 8. SUMMARY & BUTTON */
-.summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 15px;
-    background: rgba(47, 111, 78, 0.15); /* Green tint */
-    border-radius: 10px;
-    border: 1px dashed rgba(47, 111, 78, 0.4);
-}
-
-.summary-row .cost { font-size: 18px; font-weight: bold; color: #7fd1a3; }
-
+/* 9. MAIN BUTTON */
 .action-btn {
     width: 100%;
     padding: 14px;

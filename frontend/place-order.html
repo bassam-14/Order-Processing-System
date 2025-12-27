@@ -15,52 +15,46 @@
 
 <main class="container">
 
-    <div class="order-card">
-        <div class="card-header">
-            <h2>Restock Inventory</h2>
-            <p class="subtitle">Manually order more copies from the publisher.</p>
+    <div id="search-step" class="order-card">
+        <h2>Restock Inventory</h2>
+        <p class="subtitle">Enter ISBN to fetch book details.</p>
+        <div class="input-group">
+            <input type="text" id="isbn-search" placeholder="Enter ISBN (e.g. 978-013...)" required>
+            <button class="action-btn" onclick="fetchBook()">Find Book</button>
         </div>
+    </div>
 
+    <div id="order-step" class="order-card hidden">
         <div class="book-details">
             <div class="detail-row">
                 <span class="label">Book Title:</span>
-                <span class="value">Clean Code</span>
+                <span class="value" id="disp-title">...</span>
             </div>
             <div class="detail-row">
                 <span class="label">ISBN:</span>
-                <span class="value mono">978-0132350884</span>
+                <span class="value mono" id="disp-isbn">...</span>
             </div>
             <div class="detail-row">
-                <span class="label">Publisher:</span>
-                <span class="value">Pearson</span>
+                <span class="label">Publisher ID:</span>
+                <span class="value" id="disp-pub">...</span>
             </div>
         </div>
 
         <div class="stock-status-box">
             <div class="status-item">
                 <span class="label">Current Stock</span>
-                <span class="number critical">3</span>
+                <span class="number" id="disp-stock">0</span>
             </div>
             <div class="status-item">
                 <span class="label">Threshold</span>
-                <span class="number">5</span>
-            </div>
-            <div class="status-message warning">
-                &#9888; Stock is below threshold. Restock recommended.
+                <span class="number" id="disp-thresh">0</span>
             </div>
         </div>
 
-        <form id="order-form" onsubmit="handlePlaceOrder(event)">
+        <form onsubmit="handlePlaceOrder(event)">
             <div class="input-group">
                 <label>Order Quantity</label>
-                <input type="number" id="qty" value="10" min="1" required 
-                       class="qty-input" 
-                       placeholder="Enter quantity...">
-            </div>
-
-            <div class="summary-row">
-                <span>Estimated Cost:</span>
-                <span class="cost">$200.00</span>
+                <input type="number" id="qty" value="10" min="1" required class="qty-input">
             </div>
 
             <button type="submit" class="action-btn" id="submit-btn">
@@ -72,34 +66,63 @@
 </main>
 
 <script>
-    function handlePlaceOrder(event) {
-        event.preventDefault(); // Stop form from reloading immediately
+    let currentBook = null;
 
-        const btn = document.getElementById('submit-btn');
-        const originalText = btn.innerText;
+    // 1. Fetch Book Details
+    async function fetchBook() {
+        const isbn = document.getElementById('isbn-search').value;
+        try {
+            const response = await fetch(`http://localhost:8080/api/books/${isbn}`);
+            if (response.ok) {
+                currentBook = await response.json();
+                
+                // Show Details
+                document.getElementById('disp-title').innerText = currentBook.title;
+                document.getElementById('disp-isbn').innerText = currentBook.isbn;
+                document.getElementById('disp-pub').innerText = currentBook.publisherId;
+                document.getElementById('disp-stock').innerText = currentBook.stockQuantity;
+                document.getElementById('disp-thresh').innerText = currentBook.threshold;
 
-        // 1. Validation Logic
-        const qty = document.getElementById('qty').value;
-        if (qty < 1) {
-            alert("Quantity must be at least 1");
-            return;
+                // Switch Views
+                document.getElementById('search-step').style.display = 'none';
+                document.getElementById('order-step').style.display = 'block';
+            } else {
+                alert("Book not found!");
+            }
+        } catch (e) {
+            alert("Error connecting to backend");
         }
+    }
 
-        // 2. Loading State
-        btn.disabled = true;
-        btn.innerText = "Sending Request...";
-        btn.style.opacity = "0.7";
+    // 2. Send Order
+    async function handlePlaceOrder(event) {
+        event.preventDefault();
+        const qty = document.getElementById('qty').value;
+        const btn = document.getElementById('submit-btn');
 
-        // 3. Simulate API Call (2 seconds)
-        setTimeout(() => {
-            btn.innerText = "Order Placed! \u2713";
-            btn.style.background = "#2f6f4e"; // Green
+        const orderData = {
+            bookIsbn: currentBook.isbn,
+            quantity: parseInt(qty),
+            status: "ORDERED"
+        };
 
-            // 4. Redirect to Confirm Orders page to see the new pending order
-            setTimeout(() => {
-                window.location.href = "confirm-orders.html";
-            }, 1000);
-        }, 1500);
+        try {
+            const response = await fetch('http://localhost:8080/api/publisher-orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+
+            if (response.ok) {
+                btn.innerText = "Order Placed! \u2713";
+                btn.style.background = "#2f6f4e";
+                setTimeout(() => window.location.href = "confirm-orders.html", 1000);
+            } else {
+                alert("Failed to place order.");
+            }
+        } catch (e) {
+            alert("Network Error");
+        }
     }
 </script>
 

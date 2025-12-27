@@ -52,17 +52,32 @@ body {
 .search-card h2 { margin-bottom: 10px; }
 .subtitle { color: #d1d5db; font-size: 14px; margin-bottom: 25px; }
 
-.find-form { display: flex; gap: 10px; }
+.find-form { 
+    display: flex; 
+    gap: 10px; 
+    width: 100%; /* Ensure form fills container */
+}
 
 #find-input {
-    flex: 1;
+    flex: 1; /* This tells input to take all available space */
     padding: 12px;
     border-radius: 10px;
     background: rgba(255,255,255,0.1);
     border: 1px solid rgba(255,255,255,0.1);
-    color: white; outline: none;
+    color: white; 
+    outline: none;
 }
 #find-input:focus { border-color: #7fd1a3; background: rgba(255,255,255,0.2); }
+
+/* --- THE FIX: Specific style for the button inside the search form --- */
+.find-form .action-btn {
+    width: auto; /* Stop it from being 100% width */
+    white-space: nowrap; /* Keep text on one line */
+    flex-shrink: 0; /* Prevent it from getting squished */
+    padding-left: 25px;
+    padding-right: 25px;
+    margin: 0; /* Remove potential margins */
+}
 
 .error { color: #ff6b6b; font-size: 14px; margin-top: 15px; display: none; }
 
@@ -89,6 +104,7 @@ input, select {
     font-size: 15px;
     outline: none;
     transition: 0.2s;
+    box-sizing: border-box; /* Important for padding calculations */
 }
 
 /* Fix Dropdown options color on Windows */
@@ -123,4 +139,5 @@ input:focus, select:focus {
 @media (max-width: 600px) {
     .form-row { grid-template-columns: 1fr; }
     .find-form { flex-direction: column; }
+    .find-form .action-btn { width: 100%; } /* Stacks nicely on mobile */
 }

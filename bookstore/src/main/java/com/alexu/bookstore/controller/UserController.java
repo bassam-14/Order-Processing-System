@@ -25,7 +25,9 @@ public class UserController {
     // PUT /api/users/1
     @PutMapping("/{id}")
     public String updateUser(@PathVariable int id, @RequestBody User user) {
-        userService.updateUser(id, user);
+        // Ensure the ID in the path matches the ID in the object
+        user.setId(id);
+        userService.updateUser(id, user); // Calls repo.update(user)
         return "User updated successfully";
     }
 
