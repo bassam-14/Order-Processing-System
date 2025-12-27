@@ -1,6 +1,7 @@
 package com.alexu.bookstore.repository;
 
-import com.alexu.bookstore.entity.Order;
+import com.alexu.bookstore.model.CustomerOrder;
+import com.alexu.bookstore.model.OrderItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -9,47 +10,34 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.List;
-import java.util.Map;
 
 @Repository
 public class OrderRepository {
-    @Autowired
-    private JdbcTemplate db;
 
-    // Save order and return the new ID
-    public Long createOrder(Long userId, double total, String card, String expiry) {
-        String sql = "INSERT INTO customer_order (user_id, total_amount, credit_card_number, credit_card_expiry) VALUES (?, ?, ?, ?)";
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    // 1. Save the main Order and return the generated ID
+    public int saveOrder(CustomerOrder order) {
+        String sql = "INSERT INTO Customer_Order (user_id, order_date, total_price, credit_card_number, credit_card_expiry) VALUES (?, NOW(), ?, ?, ?)";
+        
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        db.update(connection -> {
+        jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setLong(1, userId);
-            ps.setDouble(2, total);
-            ps.setString(3, card);
-            ps.setString(4, expiry);
+            ps.setInt(1, order.getUserId());
+            ps.setBigDecimal(2, order.getTotalPrice());
+            ps.setString(3, order.getCreditCardNumber());
+            ps.setString(4, order.getCreditCardExpiry());
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        return keyHolder.getKey().intValue();
     }
 
-    // Save individual order items
-    public void createOrderItem(Long orderId, String isbn, int qty, double price) {
-        String sql = "INSERT INTO order_item (order_id, book_isbn, quantity, unit_price) VALUES (?, ?, ?, ?)";
-        db.update(sql, orderId, isbn, qty, price);
-    }
-
-    // Get past orders for a user [cite: 86]
-    public List<Map<String, Object>> findOrdersByUserId(Long userId) {
-        String sql = "SELECT * FROM customer_order WHERE user_id = ? ORDER BY order_date DESC";
-        return db.queryForList(sql, userId);
-    }
-    public List<Map<String, Object>> findOrderItems(Long orderId) {
-        String sql = "SELECT b.title, b.isbn, i.quantity, i.unit_price " +
-                     "FROM order_item i " +
-                     "JOIN book b ON i.book_isbn = b.isbn " +
-                     "WHERE i.order_id = ?";
-        return db.queryForList(sql, orderId);
+    // 2. Save an individual item
+    public void saveOrderItem(int orderId, OrderItem item) {
+        String sql = "INSERT INTO Order_Item (order_id, book_isbn, quantity, unit_price) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql, orderId, item.getBookIsbn(), item.getQuantity(), item.getUnitPrice());
     }
 }

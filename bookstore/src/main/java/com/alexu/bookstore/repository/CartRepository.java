@@ -1,39 +1,68 @@
 package com.alexu.bookstore.repository;
 
+import com.alexu.bookstore.model.ShoppingCart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class CartRepository {
+
     @Autowired
-    private JdbcTemplate db;
+    private JdbcTemplate jdbcTemplate;
 
-    public void addToCart(Long userId, String isbn, int qty) {
-        // ON DUPLICATE KEY UPDATE: If book is already in cart, just increase quantity
-        String query = "INSERT INTO shopping_cart (user_id, book_isbn, quantity) VALUES (?, ?, ?) " +
-                       "ON DUPLICATE KEY UPDATE quantity = quantity + ?";
-        db.update(query, userId, isbn, qty, qty);
+    // 1. Get Cart Items for a User (JOINs with Book table)
+    public List<ShoppingCart> findByUserId(int userId) {
+        String sql = "SELECT sc.*, b.title, b.price " +
+                     "FROM Shopping_Cart sc " +
+                     "JOIN Book b ON sc.book_isbn = b.isbn " +
+                     "WHERE sc.user_id = ?";
+        return jdbcTemplate.query(sql, new CartRowMapper(), userId);
     }
 
-    public void removeFromCart(Long userId, String isbn) {
-        String query = "DELETE FROM shopping_cart WHERE user_id = ? AND book_isbn = ?";
-        db.update(query, userId, isbn);
+    // 2. Add Item to Cart
+    public int save(ShoppingCart cart) {
+        // Simple logic: If exists, we should usually update quantity, but for now simple insert:
+        // You might want to run a "check if exists" query first in a real app.
+        String sql = "INSERT INTO Shopping_Cart (user_id, book_isbn, quantity, added_at) VALUES (?, ?, ?, NOW())";
+        return jdbcTemplate.update(sql,
+            cart.getUserId(),
+            cart.getBookIsbn(),
+            cart.getQuantity()
+        );
     }
 
-    public void clearCart(Long userId) {
-        String query = "DELETE FROM shopping_cart WHERE user_id = ?";
-        db.update(query, userId);
+    // 3. Remove Item
+    public int delete(int userId, String isbn) {
+        String sql = "DELETE FROM Shopping_Cart WHERE user_id = ? AND book_isbn = ?";
+        return jdbcTemplate.update(sql, userId, isbn);
     }
 
-    // NEW: Get detailed cart items (Title, Price, Total)
-    public List<Map<String, Object>> getCartDetails(Long userId) {
-        String query = "SELECT b.title, b.price, c.quantity, (b.price * c.quantity) as total_price, b.isbn " +
-                       "FROM shopping_cart c " +
-                       "JOIN book b ON c.book_isbn = b.isbn " +
-                       "WHERE c.user_id = ?";
-        return db.queryForList(query, userId);
+    // 4. Clear Cart (After checkout)
+    public int deleteAll(int userId) {
+        String sql = "DELETE FROM Shopping_Cart WHERE user_id = ?";
+        return jdbcTemplate.update(sql, userId);
+    }
+
+    // Mapper
+    private static class CartRowMapper implements RowMapper<ShoppingCart> {
+        @Override
+        public ShoppingCart mapRow(ResultSet rs, int rowNum) throws SQLException {
+            ShoppingCart cart = new ShoppingCart();
+            cart.setUserId(rs.getInt("user_id"));
+            cart.setBookIsbn(rs.getString("book_isbn"));
+            cart.setQuantity(rs.getInt("quantity"));
+            cart.setAddedAt(rs.getTimestamp("added_at"));
+            
+            // Map the joined columns
+            cart.setBookTitle(rs.getString("title"));
+            cart.setPrice(rs.getBigDecimal("price"));
+            return cart;
+        }
     }
 }

@@ -1,68 +1,70 @@
 package com.alexu.bookstore.service;
 
-import com.alexu.bookstore.repository.CartRepository;
-import com.alexu.bookstore.repository.OrderRepository;
+import com.alexu.bookstore.model.*;
+import com.alexu.bookstore.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class OrderService {
+
     @Autowired
-    private JdbcTemplate db; // Used for stock updates
+    private OrderRepository orderRepo;
     @Autowired
     private CartRepository cartRepo;
     @Autowired
-    private OrderRepository orderRepo; // NEW: Injected Repository
+    private BookRepository bookRepo;
 
-    @Transactional
-    public String checkout(Long userId, String creditCard, String expiry) {
-        // 1. Get cart items
-        List<Map<String, Object>> cartItems = cartRepo.getCartDetails(userId);
-        if (cartItems.isEmpty()) return "Cart is empty!";
-
-        // 2. Calculate Total
-        double totalAmount = 0;
-        for (Map<String, Object> item : cartItems) {
-            totalAmount += ((Number) item.get("total_price")).doubleValue();
-        }
-
-        // 3. Save Order using Repository (No raw SQL here)
-        Long newOrderId = orderRepo.createOrder(userId, totalAmount, creditCard, expiry);
-
-        // 4. Process Items: Save to history and Deduct Stock
-        for (Map<String, Object> item : cartItems) {
-            String isbn = (String) item.get("isbn");
-            int quantity = ((Number) item.get("quantity")).intValue();
-            double price = ((Number) item.get("price")).doubleValue();
-
-            // A. Save Item using Repository
-            orderRepo.createOrderItem(newOrderId, isbn, quantity, price);
-
-            // B. Deduct Stock (Direct SQL is fine here for specific logic, or move to BookRepo)
-            int updated = db.update("UPDATE book SET stock_quantity = stock_quantity - ? WHERE isbn = ? AND stock_quantity >= ?", 
-                                    quantity, isbn, quantity);
-            
-            if (updated == 0) {
-                throw new RuntimeException("Out of stock for book: " + isbn); // Rollback entire transaction
-            }
-        }
-
-        // 5. Clear Cart
-        cartRepo.clearCart(userId);
+    @Transactional // CRITICAL: If any step fails, everything rolls back
+    public void checkout(int userId, String ccNumber, String ccExpiry) {
         
-        return "Order Placed Successfully! Order ID: " + newOrderId;
-    }
+        // 1. Get items from Cart
+        List<ShoppingCart> cartItems = cartRepo.findByUserId(userId);
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("Cart is empty!");
+        }
 
-    // New: View Past Orders
-    public List<Map<String, Object>> getUserOrders(Long userId) {
-        return orderRepo.findOrdersByUserId(userId);
+        // 2. Calculate Total Price & Validate Stock
+        BigDecimal total = BigDecimal.ZERO;
+        for (ShoppingCart cartItem : cartItems) {
+            Book book = bookRepo.findByIsbn(cartItem.getBookIsbn());
+            
+            // Check Stock (Part 1 Logic)
+            if (book.getStockQuantity() < cartItem.getQuantity()) {
+                throw new RuntimeException("Not enough stock for book: " + book.getTitle());
+            }
+            
+            // Add to total
+            BigDecimal itemTotal = book.getPrice().multiply(new BigDecimal(cartItem.getQuantity()));
+            total = total.add(itemTotal);
+        }
+
+        // 3. Create the Order Record
+        CustomerOrder order = new CustomerOrder();
+        order.setUserId(userId);
+        order.setTotalPrice(total);
+        order.setCreditCardNumber(ccNumber);
+        order.setCreditCardExpiry(ccExpiry);
+        
+        int orderId = orderRepo.saveOrder(order); // Get the new ID
+
+        // 4. Move items to Order_Item and Deduct Stock
+        for (ShoppingCart cartItem : cartItems) {
+            Book book = bookRepo.findByIsbn(cartItem.getBookIsbn());
+            
+            // Create Order Item
+            OrderItem orderItem = new OrderItem(book.getIsbn(), cartItem.getQuantity(), book.getPrice());
+            orderRepo.saveOrderItem(orderId, orderItem);
+
+            // DEDUCT STOCK (Update Part 1)
+            bookRepo.updateStock(book.getIsbn(), book.getStockQuantity() - cartItem.getQuantity());
+        }
+
+        // 5. Clear the Cart
+        cartRepo.deleteAll(userId);
     }
-    public List<Map<String, Object>> getOrderDetails(Long orderId) {
-    return orderRepo.findOrderItems(orderId);
-}
 }

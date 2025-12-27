@@ -1,6 +1,6 @@
 package com.alexu.bookstore.service;
 
-import com.alexu.bookstore.entity.User;
+import com.alexu.bookstore.model.User;
 import com.alexu.bookstore.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,30 +11,26 @@ public class UserService {
     @Autowired
     private UserRepository userRepo;
 
-    // Logic for Sign Up 
-    public String signUp(User user) {
-        // Rule: Check if username is already taken
-        if (userRepo.exists(user.username)) {
-            return "Username already exists!";
+    public void registerUser(User user) {
+        // Check if username exists
+        if (userRepo.findByUsername(user.getUsername()) != null) {
+            throw new IllegalArgumentException("Username already exists!");
         }
-        
-        // Save to database
         userRepo.save(user);
-        return "Success!";
     }
 
-    // Logic for Login [cite: 65]
-    public String login(String username, String password) {
+    public User login(String username, String password) {
         User user = userRepo.findByUsername(username);
-        
-        if (user == null) {
-            return "User not found!";
+        if (user != null && user.getPassword().equals(password)) {
+            return user; // Login success
         }
-        
-        if (user.password.equals(password)) {
-            return "Login Successful!";
-        } else {
-            return "Wrong password!";
+        return null; // Login failed
+    }
+
+    public void addUserPhone(String username, String phone) {
+        User user = userRepo.findByUsername(username);
+        if (user != null) {
+            userRepo.addPhone(user.getId(), phone);
         }
     }
 }
