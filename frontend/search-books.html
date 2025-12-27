@@ -17,81 +17,74 @@
 
     <div class="search-header">
         <form onsubmit="handleSearch(event)" class="search-box">
-            <input type="text" id="search-input" 
-                   placeholder="Search by Title, Author, or ISBN..." 
-                   required minlength="2">
+            <input type="text" id="search-input" placeholder="Search by Title..." required>
             
             <select id="category-filter">
                 <option value="all">All Categories</option>
                 <option value="Science">Science</option>
                 <option value="Technology">Technology</option>
                 <option value="Fiction">Fiction</option>
+                <option value="History">History</option>
             </select>
 
             <button type="submit" class="action-btn">Search</button>
         </form>
     </div>
 
-    <div class="results-grid" id="results-area">
-        </div>
-
-    <div id="no-results" class="no-results hidden">
-        <p>No books found matching your search.</p>
-    </div>
+    <div class="results-grid" id="results-area"></div>
+    <div id="no-results" class="no-results hidden"><p>No books found.</p></div>
 
 </main>
 
 <script>
-    // 1. DETERMINE USER ROLE
     const urlParams = new URLSearchParams(window.location.search);
     const role = urlParams.get('role'); // 'admin' or 'customer'
     
-    // 2. CONFIGURE BACK BUTTON
+    // Back Link Logic
     const backLink = document.getElementById('back-link');
     if (role === 'admin') {
         backLink.href = 'admin.html';
         backLink.innerText = 'Back to Dashboard';
     } else {
-        // Default to customer
         backLink.href = 'customer.html';
         backLink.innerText = 'Back to Home';
     }
 
-    // 3. BOOK DATA (Colors added for covers)
-    const booksDB = [
-        { id: 1, title: "Clean Code", author: "Robert C. Martin", price: "$30.00", category: "Technology", cover: "#2f6f4e" },
-        { id: 2, title: "The Pragmatic Programmer", author: "Andy Hunt", price: "$45.00", category: "Technology", cover: "#1e3a8a" }, /* Blue */
-        { id: 3, title: "Design Patterns", author: "Gang of Four", price: "$50.00", category: "Technology", cover: "#7f1d1d" }, /* Red */
-        { id: 4, title: "A Brief History of Time", author: "Stephen Hawking", price: "$15.00", category: "Science", cover: "#0f766e" }, /* Teal */
-        { id: 5, title: "The Great Gatsby", author: "F. Scott Fitzgerald", price: "$10.00", category: "Fiction", cover: "#eab308" } /* Gold */
-    ];
-
-    // 4. RENDER ON LOAD
-    window.onload = function() {
-        renderBooks(booksDB);
+    // 1. Load All Books on Start
+    window.onload = async function() {
+        await loadBooks();
     };
 
-    // 5. SEARCH LOGIC
-    function handleSearch(event) {
-        event.preventDefault();
-        const query = document.getElementById('search-input').value.toLowerCase();
-        const category = document.getElementById('category-filter').value;
+    async function loadBooks(categoryFilter = 'all', textQuery = '') {
+        try {
+            // Fetch all books (Simplest approach for prototype)
+            // Ideally, backend has /search endpoint. Here we filter client-side for smoother UI.
+            const response = await fetch('http://localhost:8080/api/books');
+            const allBooks = await response.json();
 
-        const filteredBooks = booksDB.filter(book => {
-            const matchesText = book.title.toLowerCase().includes(query) || 
-                                book.author.toLowerCase().includes(query);
-            const matchesCat = category === 'all' || book.category === category;
-            return matchesText && matchesCat;
-        });
+            // Filter
+            const filtered = allBooks.filter(book => {
+                const matchesText = !textQuery || book.title.toLowerCase().includes(textQuery.toLowerCase());
+                const matchesCat = categoryFilter === 'all' || book.category === categoryFilter.toUpperCase(); // Backend enum is uppercase
+                return matchesText && matchesCat;
+            });
 
-        renderBooks(filteredBooks);
+            renderBooks(filtered);
+        } catch (e) {
+            console.error("Error loading books", e);
+        }
     }
 
-    // 6. RENDER CARDS (UPDATED FOR 3D BOOK)
+    function handleSearch(event) {
+        event.preventDefault();
+        const query = document.getElementById('search-input').value;
+        const cat = document.getElementById('category-filter').value;
+        loadBooks(cat, query);
+    }
+
     function renderBooks(books) {
         const grid = document.getElementById('results-area');
         const noRes = document.getElementById('no-results');
-        
         grid.innerHTML = ''; 
 
         if (books.length === 0) {
@@ -102,37 +95,49 @@
         }
 
         books.forEach(book => {
-            // Button Logic
             let actionBtn = '';
             if (role === 'admin') {
-                actionBtn = `<a href="update-book.html?id=${book.id}" class="card-btn admin">Edit Details</a>`;
+                // Pass ISBN as ID for update page
+                actionBtn = `<a href="update-book.html?id=${book.isbn}" class="card-btn admin">Edit Details</a>`;
             } else {
-                actionBtn = `<button class="card-btn customer" onclick="addToCart('${book.title}')">Add to Cart</button>`;
+                actionBtn = `<button class="card-btn customer" onclick="addToCart('${book.isbn}', '${book.title}')">Add to Cart</button>`;
             }
 
-            const html = `
+            // Colors for aesthetic
+            const colors = ['#2f6f4e', '#1e3a8a', '#7f1d1d', '#0f766e', '#eab308'];
+            const bg = colors[book.id % colors.length] || '#2f6f4e';
+
+            grid.innerHTML += `
                 <div class="book-card">
-                    <div class="book-visual" style="background: ${book.cover}">
-                        <span>${book.title[0]}</span>
+                    <div class="book-visual" style="background: ${bg}">
+                        <span>${book.title.substring(0,1)}</span>
                     </div>
-                    
                     <div class="book-info">
                         <h3>${book.title}</h3>
-                        <p class="author">${book.author}</p>
+                        <p class="author">Price: $${book.price}</p>
                         <div class="price-row">
-                            <span class="price">${book.price}</span>
-                            <span class="tag">${book.category}</span>
+                             <span class="tag">${book.category}</span>
+                             <span class="price">Stock: ${book.stockQuantity}</span>
                         </div>
                         ${actionBtn}
                     </div>
-                </div>
-            `;
-            grid.innerHTML += html;
+                </div>`;
         });
     }
 
-    function addToCart(title) {
-        alert(title + " added to your cart!");
+    async function addToCart(isbn, title) {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user) { alert("Please login first"); return; }
+
+        try {
+            const res = await fetch('http://localhost:8080/api/cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id, bookIsbn: isbn, quantity: 1 })
+            });
+            if (res.ok) alert(title + " added to cart!");
+            else alert("Failed to add to cart.");
+        } catch (e) { alert("Network Error"); }
     }
 </script>
 

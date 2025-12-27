@@ -18,38 +18,12 @@
     <section class="report-card full-width">
         <div class="card-header">
             <h2>Monthly Sales Report</h2>
-            <p class="subtitle">Total sales for the previous month (October 2025)</p>
+            <p class="subtitle">Total sales for the previous month</p>
         </div>
         <div class="stat-box">
             <span class="currency">$</span>
-            <span class="amount">15,240.00</span>
+            <span class="amount" id="monthly-total">0.00</span>
         </div>
-        <table class="data-table">
-            <thead>
-            <tr>
-                <th>Category</th>
-                <th>Books Sold</th>
-                <th>Revenue</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Science</td>
-                <td>120</td>
-                <td>$3,600.00</td>
-            </tr>
-            <tr>
-                <td>History</td>
-                <td>85</td>
-                <td>$2,125.00</td>
-            </tr>
-             <tr>
-                <td>Art</td>
-                <td>45</td>
-                <td>$1,350.00</td>
-            </tr>
-            </tbody>
-        </table>
     </section>
 
     <section class="report-card">
@@ -69,15 +43,15 @@
 
     <section class="report-card">
         <h2>Replenishment Stats</h2>
-        <p class="subtitle">Check how many times a book was re-ordered.</p>
+        <p class="subtitle">Check how many times a book was re-ordered (Enter ISBN).</p>
         
         <form onsubmit="handleReplenishSearch(event)" class="search-form">
-            <input type="text" id="book-search" placeholder="Enter Book Title or ISBN" required>
+            <input type="text" id="book-search" placeholder="Enter ISBN (e.g. 978-013...)" required>
             <button type="submit" class="action-btn small">Search</button>
         </form>
 
         <div id="replenish-result" class="result-box hidden">
-            <p>Book: <span id="r-book" style="color:white">...</span></p>
+            <p>ISBN: <span id="r-book" style="color:white">...</span></p>
             <p>Times Ordered by Admin: <strong class="highlight-blue" id="r-count">0</strong></p>
         </div>
     </section>
@@ -93,33 +67,7 @@
                 <th>Total Spent</th>
             </tr>
             </thead>
-            <tbody>
-            <tr>
-                <td>1</td>
-                <td>John Doe</td>
-                <td>$420.00</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Sarah Smith</td>
-                <td>$350.50</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Michael Brown</td>
-                <td>$210.00</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>Emily White</td>
-                <td>$180.00</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>David Lee</td>
-                <td>$150.00</td>
-            </tr>
-            </tbody>
+            <tbody id="top-customers-list"></tbody>
         </table>
     </section>
 
@@ -134,70 +82,93 @@
                 <th>Sold</th>
             </tr>
             </thead>
-            <tbody>
-            <tr>
-                <td>1</td>
-                <td>Clean Code</td>
-                <td>45</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>The Pragmatic Programmer</td>
-                <td>38</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Intro to Algorithms</td>
-                <td>30</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>Design Patterns</td>
-                <td>22</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>Artificial Intelligence</td>
-                <td>18</td>
-            </tr>
-            </tbody>
+            <tbody id="top-books-list"></tbody>
         </table>
     </section>
 
 </main>
 
 <script>
-    // 1. Handle Daily Sales Search
-    function handleDailySales(event) {
+    // 1. Load Initial Data (Monthly, Top Customers, Top Books)
+    window.onload = async function() {
+        try {
+            // A. Monthly Sales
+            const resSales = await fetch('http://localhost:8080/api/reports/sales/prev-month');
+            const sales = await resSales.json();
+            document.getElementById('monthly-total').innerText = (sales || 0).toFixed(2);
+
+            // B. Top Customers
+            const resCust = await fetch('http://localhost:8080/api/reports/top-customers');
+            const customers = await resCust.json();
+            const custBody = document.getElementById('top-customers-list');
+            custBody.innerHTML = '';
+            customers.forEach((c, index) => {
+                custBody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${c.username}</td>
+                        <td>$${c.total_spent ? c.total_spent.toFixed(2) : '0.00'}</td>
+                    </tr>`;
+            });
+
+            // C. Top Books
+            const resBooks = await fetch('http://localhost:8080/api/reports/top-books');
+            const books = await resBooks.json();
+            const bookBody = document.getElementById('top-books-list');
+            bookBody.innerHTML = '';
+            books.forEach((b, index) => {
+                bookBody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${b.title}</td>
+                        <td>${b.copies_sold}</td>
+                    </tr>`;
+            });
+
+        } catch (e) {
+            console.error("Error loading reports", e);
+        }
+    };
+
+    // 2. Handle Daily Sales
+    async function handleDailySales(event) {
         event.preventDefault();
         const dateInput = document.getElementById('sales-date').value;
         if(!dateInput) return;
 
-        // Simulate Random Sales Data
-        const randomTotal = (Math.random() * 1000).toFixed(2);
-        
-        document.getElementById('display-date').innerText = dateInput;
-        document.getElementById('display-amount').innerText = "$" + randomTotal;
-        
-        const resultBox = document.getElementById('daily-result');
-        resultBox.classList.remove('hidden');
-        resultBox.classList.add('fade-in');
+        try {
+            const response = await fetch(`http://localhost:8080/api/reports/sales/day?date=${dateInput}`);
+            const total = await response.json();
+            
+            document.getElementById('display-date').innerText = dateInput;
+            document.getElementById('display-amount').innerText = "$" + (total || 0).toFixed(2);
+            
+            const resultBox = document.getElementById('daily-result');
+            resultBox.classList.remove('hidden');
+            resultBox.classList.add('fade-in');
+        } catch (e) {
+            alert("Error fetching daily sales");
+        }
     }
 
-    // 2. Handle Replenishment Search
-    function handleReplenishSearch(event) {
+    // 3. Handle Replenishment Search
+    async function handleReplenishSearch(event) {
         event.preventDefault();
-        const query = document.getElementById('book-search').value;
+        const isbn = document.getElementById('book-search').value;
         
-        // Simulate Random Count (1 to 10)
-        const randomCount = Math.floor(Math.random() * 10) + 1;
+        try {
+            const response = await fetch(`http://localhost:8080/api/reports/restock/${isbn}`);
+            const count = await response.json();
 
-        document.getElementById('r-book').innerText = query;
-        document.getElementById('r-count').innerText = randomCount + " times";
+            document.getElementById('r-book').innerText = isbn;
+            document.getElementById('r-count').innerText = count + " times";
 
-        const resultBox = document.getElementById('replenish-result');
-        resultBox.classList.remove('hidden');
-        resultBox.classList.add('fade-in');
+            const resultBox = document.getElementById('replenish-result');
+            resultBox.classList.remove('hidden');
+            resultBox.classList.add('fade-in');
+        } catch (e) {
+            alert("Error fetching restock stats. Check ISBN.");
+        }
     }
 </script>
 

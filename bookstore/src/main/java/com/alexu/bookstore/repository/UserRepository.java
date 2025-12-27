@@ -27,18 +27,28 @@ public class UserRepository {
         }
     }
 
+    public void update(User user) {
+        String sql = "UPDATE User SET first_name=?, last_name=?, email=?, address=?, password=? WHERE id=?";
+        jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getAddress(),
+                user.getPassword(), user.getId());
+    }
+
+    public User findById(int id) {
+        String sql = "SELECT * FROM User WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
+    }
+
     // 2. Register New User
     public int save(User user) {
         String sql = "INSERT INTO User (username, password, first_name, last_name, email, address, role) VALUES (?, ?, ?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
-            user.getUsername(),
-            user.getPassword(), // In a real app, hash this!
-            user.getFirstName(),
-            user.getLastName(),
-            user.getEmail(),
-            user.getAddress(),
-            user.getRole().name()
-        );
+                user.getUsername(),
+                user.getPassword(), // In a real app, hash this!
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getAddress(),
+                user.getRole().name());
     }
 
     // 3. Add Phone Number

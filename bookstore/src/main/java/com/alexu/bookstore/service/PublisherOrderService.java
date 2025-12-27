@@ -22,4 +22,8 @@ public class PublisherOrderService {
         }
         orderRepo.save(order);
     }
+
+    public void updateStatus(int id, String status) {
+        orderRepo.updateStatus(id, status);
+    }
 }

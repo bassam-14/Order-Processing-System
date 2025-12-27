@@ -23,4 +23,9 @@ public class PublisherOrderController {
         orderService.placeOrder(order);
         return "Order sent to publisher successfully!";
     }
+
+    @PutMapping("/{id}/status")
+    public void updateStatus(@PathVariable int id, @RequestParam String status) {
+        orderService.updateStatus(id, status);
+    }
 }

@@ -15,16 +15,16 @@
 
 <main class="container">
 
-    <div id="search-section" class="card search-card hidden">
+    <div id="search-section" class="card search-card">
         <h2>Find Book to Edit</h2>
-        <p class="subtitle">Enter the Title or ISBN of the book you want to update.</p>
+        <p class="subtitle">Enter the ISBN of the book you want to update.</p>
         
         <form id="search-form-internal" onsubmit="handleFindBook(event)" class="find-form">
-            <input type="text" id="find-input" placeholder="e.g. Clean Code" required>
+            <input type="text" id="find-input" placeholder="e.g. 978-..." required>
             <button type="submit" class="action-btn">Find Book</button>
         </form>
         
-        <p id="error-msg" class="error">Book not found. Try searching for "Clean Code".</p>
+        <p id="error-msg" class="error" style="display:none;">Book not found.</p>
     </div>
 
     <div id="edit-section" class="card edit-card hidden">
@@ -47,8 +47,8 @@
                     <input type="text" id="book-title" required minlength="2">
                 </div>
                 <div class="input-group">
-                    <label>Author</label>
-                    <input type="text" id="book-author" required minlength="2" oninput="noNumbers(this)">
+                    <label>Publisher ID</label>
+                    <input type="number" id="book-publisher-id" required>
                 </div>
             </div>
 
@@ -56,10 +56,11 @@
                 <div class="input-group">
                     <label>Category</label>
                     <select id="book-category">
-                        <option value="Technology">Technology</option>
                         <option value="Science">Science</option>
+                        <option value="Technology">Technology</option>
                         <option value="Fiction">Fiction</option>
                         <option value="History">History</option>
+                        <option value="Geography">Geography</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -69,8 +70,13 @@
             </div>
 
             <div class="input-group">
-                <label>Current Stock Quantity</label>
-                <input type="number" id="book-stock" min="0" required>
+                <label>Threshold (Min Stock)</label>
+                <input type="number" id="book-threshold" min="0" required>
+            </div>
+            
+             <div class="input-group">
+                <label>Publication Year</label>
+                <input type="number" id="book-year" required>
             </div>
 
             <div class="actions">
@@ -82,104 +88,89 @@
 </main>
 
 <script>
-    // 1. MOCK DATABASE (Must match your Search Page data exactly)
-    const booksDB = [
-        { id: 1, isbn: "978-0132350884", title: "Clean Code", author: "Robert C. Martin", price: 30.00, stock: 15, category: "Technology" },
-        { id: 2, isbn: "978-0201616224", title: "The Pragmatic Programmer", author: "Andy Hunt", price: 45.00, stock: 8, category: "Technology" },
-        { id: 3, isbn: "978-0201633610", title: "Design Patterns", author: "Gang of Four", price: 50.00, stock: 20, category: "Technology" },
-        { id: 4, isbn: "978-0553380163", title: "A Brief History of Time", author: "Stephen Hawking", price: 15.00, stock: 5, category: "Science" },
-        { id: 5, isbn: "978-0743273565", title: "The Great Gatsby", author: "F. Scott Fitzgerald", price: 10.00, stock: 50, category: "Fiction" }
-    ];
-
-    // 2. CHECK URL
+    // 1. CHECK URL (If coming from search page)
     const params = new URLSearchParams(window.location.search);
-    const urlId = params.get('id'); 
+    const urlId = params.get('id'); // 'id' here corresponds to ISBN in our logic
     const backLink = document.getElementById('back-link');
 
-    // 3. INITIALIZE PAGE
     if (urlId) {
-        // CAME FROM SEARCH PAGE
         backLink.href = 'search-books.html?role=admin';
         backLink.innerText = 'Back to Search';
-        
-        // Hide Search, Show Edit
-        document.getElementById('search-section').style.display = 'none';
-        document.getElementById('edit-section').style.display = 'block';
-        
-        loadBookData(urlId); // Load by ID
+        loadBookData(urlId); 
     } else {
-        // CAME FROM DASHBOARD
         backLink.href = 'admin.html';
         backLink.innerText = 'Back to Dashboard';
-        
-        // Show Search, Hide Edit
         document.getElementById('search-section').style.display = 'block';
-        document.getElementById('edit-section').style.display = 'none';
     }
 
-    // 4. LOAD DATA HELPER
-    function loadBookData(identifier) {
-        // Strict Comparison converted to Lowercase for flexibility
-        const book = booksDB.find(b => 
-            b.id == identifier || 
-            b.title.toLowerCase().trim() === identifier.toLowerCase().trim() ||
-            b.isbn === identifier.trim()
-        );
+    // 2. LOAD DATA
+    async function loadBookData(isbn) {
+        try {
+            const response = await fetch(`http://localhost:8080/api/books/${isbn}`);
+            if (response.ok) {
+                const book = await response.json();
+                
+                // Fill Fields
+                document.getElementById('book-isbn').value = book.isbn;
+                document.getElementById('book-title').value = book.title;
+                document.getElementById('book-publisher-id').value = book.publisherId;
+                document.getElementById('book-price').value = book.price;
+                document.getElementById('book-category').value = book.category;
+                document.getElementById('book-threshold').value = book.threshold;
+                document.getElementById('book-year').value = book.publicationYear;
 
-        if (book) {
-            // Fill Fields
-            document.getElementById('book-isbn').value = book.isbn;
-            document.getElementById('book-title').value = book.title;
-            document.getElementById('book-author').value = book.author;
-            document.getElementById('book-price').value = book.price.toFixed(2);
-            document.getElementById('book-stock').value = book.stock;
-            document.getElementById('book-category').value = book.category;
-
-            // Switch Views
-            document.getElementById('search-section').style.display = 'none';
-            document.getElementById('edit-section').style.display = 'block';
-            document.getElementById('edit-section').classList.add('fade-in');
-            document.getElementById('error-msg').style.display = 'none';
-        } else {
-            // Show Error
-            document.getElementById('error-msg').style.display = 'block';
+                // Show Edit UI
+                document.getElementById('search-section').style.display = 'none';
+                document.getElementById('edit-section').style.display = 'block';
+                document.getElementById('edit-section').classList.remove('hidden');
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+                document.getElementById('error-msg').innerText = "Book not found (Check ISBN)";
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Connection Error");
         }
     }
 
-    // 5. HANDLE SEARCH SUBMISSION (The part that was broken)
+    // 3. HANDLE SEARCH SUBMISSION
     function handleFindBook(event) {
-        event.preventDefault(); // Stop reload
+        event.preventDefault(); 
         const query = document.getElementById('find-input').value;
-        if(query) {
-            loadBookData(query);
-        }
+        if(query) loadBookData(query);
     }
 
-    // 6. HANDLE UPDATE SIMULATION
-    function handleUpdate(event) {
+    // 4. HANDLE UPDATE
+    async function handleUpdate(event) {
         event.preventDefault();
-        const btn = document.getElementById('save-btn');
+        const isbn = document.getElementById('book-isbn').value;
         
-        btn.disabled = true;
-        btn.innerText = "Updating...";
-        btn.style.opacity = "0.7";
+        const updatedBook = {
+            isbn: isbn,
+            title: document.getElementById('book-title').value,
+            publisherId: parseInt(document.getElementById('book-publisher-id').value),
+            category: document.getElementById('book-category').value,
+            price: parseFloat(document.getElementById('book-price').value),
+            threshold: parseInt(document.getElementById('book-threshold').value),
+            publicationYear: parseInt(document.getElementById('book-year').value)
+        };
 
-        setTimeout(() => {
-            btn.innerText = "Updated Successfully! \u2713";
-            btn.style.background = "#2f6f4e";
+        try {
+            const response = await fetch(`http://localhost:8080/api/books/${isbn}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedBook)
+            });
 
-            setTimeout(() => {
-                if (urlId) {
-                    window.location.href = "search-books.html?role=admin";
-                } else {
-                    window.location.href = "admin.html";
-                }
-            }, 1000);
-        }, 1500);
-    }
-
-    function noNumbers(input) {
-        input.value = input.value.replace(/[^a-zA-Z\s]/g, '');
+            if (response.ok) {
+                alert("Book Updated Successfully!");
+                window.location.href = "admin.html";
+            } else {
+                alert("Update failed: " + await response.text());
+            }
+        } catch (e) {
+            alert("Network error");
+        }
     }
 </script>
 

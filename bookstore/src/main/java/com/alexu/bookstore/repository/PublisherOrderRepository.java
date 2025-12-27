@@ -27,11 +27,16 @@ public class PublisherOrderRepository {
     public int save(PublisherOrder order) {
         String sql = "INSERT INTO Publisher_Order (book_isbn, quantity, order_date, status) VALUES (?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
-            order.getBookIsbn(),
-            order.getQuantity(),
-            new java.sql.Timestamp(new java.util.Date().getTime()), // Current Time
-            OrderStatus.ORDERED.name() // Default status
+                order.getBookIsbn(),
+                order.getQuantity(),
+                new java.sql.Timestamp(new java.util.Date().getTime()), // Current Time
+                OrderStatus.ORDERED.name() // Default status
         );
+    }
+
+    public void updateStatus(int id, String status) {
+        String sql = "UPDATE Publisher_Order SET status = ? WHERE id = ?";
+        jdbcTemplate.update(sql, status, id);
     }
 
     // Mapper
@@ -39,12 +44,11 @@ public class PublisherOrderRepository {
         @Override
         public PublisherOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
             return new PublisherOrder(
-                rs.getInt("id"),
-                rs.getString("book_isbn"),
-                rs.getInt("quantity"),
-                rs.getTimestamp("order_date"),
-                OrderStatus.valueOf(rs.getString("status"))
-            );
+                    rs.getInt("id"),
+                    rs.getString("book_isbn"),
+                    rs.getInt("quantity"),
+                    rs.getTimestamp("order_date"),
+                    OrderStatus.valueOf(rs.getString("status")));
         }
     }
 }

@@ -15,21 +15,21 @@
 
         <form onsubmit="event.preventDefault();">
             <div class="input-group">
-                <input type="text" placeholder="Username">
+                <input type="text" id="username" placeholder="Username" required>
             </div>
             <div class="input-group">
-                <input type="password" placeholder="Password">
+                <input type="password" id="password" placeholder="Password" required>
             </div>
 
             <p style="font-size: 12px; color: #7fd1a3; margin-top: 10px; margin-bottom: 5px;">
-                Select Role (Demo Mode):
+                Select Role:
             </p>
             
-            <button class="action-btn" onclick="window.location.href='admin.html'">
+            <button class="action-btn" onclick="handleLogin('ADMIN')">
                 Login as Admin
             </button>
             
-            <button class="action-btn secondary" onclick="window.location.href='customer.html'">
+            <button class="action-btn secondary" onclick="handleLogin('CUSTOMER')">
                 Login as Customer
             </button>
         </form>
@@ -40,6 +40,50 @@
         </p>
     </div>
 </div>
+
+<script>
+    async function handleLogin(intendedRole) {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        if(!username || !password) {
+            alert("Please enter username and password");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8080/api/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: username, password: password })
+            });
+
+            if (response.ok) {
+                const user = await response.json();
+
+                // Role Check
+                if (user.role !== intendedRole) {
+                    alert(`Access Denied! You are registered as a ${user.role}, but tried to login as ${intendedRole}.`);
+                    return;
+                }
+
+                // Save User & Redirect
+                localStorage.setItem('currentUser', JSON.stringify(user));
+
+                if (user.role === 'ADMIN') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'customer.html';
+                }
+            } else {
+                alert("Login Failed: Invalid credentials");
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Could not connect to the server. Is the backend running?");
+        }
+    }
+</script>
 
 </body>
 </html>

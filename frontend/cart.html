@@ -19,7 +19,6 @@
         <thead>
         <tr>
             <th>Book</th>
-            <th>Author</th>
             <th>Price</th>
             <th>Quantity</th>
             <th>Total</th>
@@ -27,38 +26,13 @@
         </tr>
         </thead>
         <tbody id="cart-items">
-        <tr class="cart-row">
-            <td>Clean Code</td>
-            <td>Robert C. Martin</td>
-            <td class="price" data-price="30">$30.00</td>
-            <td>
-                <input type="number" value="1" min="1" class="qty-input" 
-                       onchange="if(this.value < 1) this.value = 1;"
-                       oninput="updateCart()">
-            </td>
-            <td class="item-total">$30.00</td>
-            <td><a href="#" class="remove-btn" onclick="removeItem(this)">Remove</a></td>
-        </tr>
-
-        <tr class="cart-row">
-            <td>Design Patterns</td>
-            <td>GoF</td>
-            <td class="price" data-price="45">$45.00</td>
-            <td>
-                <input type="number" value="2" min="1" class="qty-input"
-                       onchange="if(this.value < 1) this.value = 1;"
-                       oninput="updateCart()">
-            </td>
-            <td class="item-total">$90.00</td>
-            <td><a href="#" class="remove-btn" onclick="removeItem(this)">Remove</a></td>
-        </tr>
-        </tbody>
+            </tbody>
     </table>
 
     <div class="cart-summary">
         <div class="totals">
-            <p><strong>Total Items:</strong> <span id="summary-items">3</span></p>
-            <p class="total-price"><strong>Total Price:</strong> <span id="summary-total">$120.00</span></p>
+            <p><strong>Total Items:</strong> <span id="summary-items">0</span></p>
+            <p class="total-price"><strong>Total Price:</strong> <span id="summary-total">$0.00</span></p>
         </div>
         <a href="checkout.html" class="action">Checkout</a>
     </div>
@@ -66,46 +40,55 @@
 </main>
 
 <script>
-    // Runs whenever a user changes a quantity
-    function updateCart() {
-        let totalItems = 0;
-        let totalPrice = 0;
-        
-        // Loop through every row in the cart
-        const rows = document.querySelectorAll('.cart-row');
-        
-        rows.forEach(row => {
-            // Get the price from the data attribute (e.g., 30)
-            const price = parseFloat(row.querySelector('.price').dataset.price);
-            // Get the current quantity value
-            const qtyInput = row.querySelector('.qty-input');
-            let qty = parseInt(qtyInput.value);
+    window.onload = async function() {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user) { window.location.href = 'login.html'; return; }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/cart/${user.id}`);
+            const cartItems = await response.json();
+
+            const tbody = document.getElementById('cart-items');
+            tbody.innerHTML = '';
             
-            // Safety check: if empty or invalid, treat as 0
-            if (isNaN(qty) || qty < 1) qty = 1;
+            let totalItems = 0;
+            let totalPrice = 0;
 
-            // Math: Price * Quantity
-            const rowTotal = price * qty;
+            cartItems.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                totalItems += item.quantity;
+                totalPrice += itemTotal;
 
-            // Update the "Total" column for this specific book
-            row.querySelector('.item-total').innerText = '$' + rowTotal.toFixed(2);
+                tbody.innerHTML += `
+                <tr class="cart-row">
+                    <td>${item.bookTitle}</td>
+                    <td class="price">$${item.price.toFixed(2)}</td>
+                    <td>
+                        <input type="number" value="${item.quantity}" min="1" class="qty-input" 
+                               onchange="updateQuantity('${item.bookIsbn}', this.value)">
+                    </td>
+                    <td class="item-total">$${itemTotal.toFixed(2)}</td>
+                    <td><button class="remove-btn" onclick="removeItem('${item.bookIsbn}')">Remove</button></td>
+                </tr>`;
+            });
 
-            // Add to the global totals
-            totalItems += qty;
-            totalPrice += rowTotal;
-        });
+            document.getElementById('summary-items').innerText = totalItems;
+            document.getElementById('summary-total').innerText = '$' + totalPrice.toFixed(2);
+        } catch (error) {
+            console.error("Error loading cart:", error);
+        }
+    };
 
-        // Update the Bottom Summary
-        document.getElementById('summary-items').innerText = totalItems;
-        document.getElementById('summary-total').innerText = '$' + totalPrice.toFixed(2);
+    async function updateQuantity(isbn, newQty) {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        await fetch(`http://localhost:8080/api/cart/update?userId=${user.id}&isbn=${isbn}&quantity=${newQty}`, { method: 'PUT' });
+        location.reload(); 
     }
 
-    // Optional: Remove item visual logic
-    function removeItem(element) {
-        // Removes the row from the table
-        element.closest('tr').remove();
-        // Recalculate totals immediately
-        updateCart();
+    async function removeItem(isbn) {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        await fetch(`http://localhost:8080/api/cart/${user.id}/remove/${isbn}`, { method: 'DELETE' });
+        location.reload();
     }
 </script>
 

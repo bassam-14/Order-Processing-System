@@ -22,6 +22,12 @@ public class UserController {
             return "Error: " + e.getMessage();
         }
     }
+    // PUT /api/users/1
+    @PutMapping("/{id}")
+    public String updateUser(@PathVariable int id, @RequestBody User user) {
+        userService.updateUser(id, user);
+        return "User updated successfully";
+    }
 
     // POST /api/users/login
     @PostMapping("/login")
