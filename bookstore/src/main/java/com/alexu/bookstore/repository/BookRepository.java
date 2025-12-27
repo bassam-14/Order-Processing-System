@@ -74,7 +74,14 @@ public class BookRepository {
                 book.getThreshold(),
                 book.getIsbn());
     }
-
+    public List<Book> findByAuthor(String authorName) {
+    String sql = "SELECT b.* FROM Book b " +
+                 "JOIN Book_Author ba ON b.isbn = ba.book_isbn " +
+                 "JOIN Author a ON ba.author_id = a.id " +
+                 "WHERE a.name LIKE ?";
+                 
+    return jdbcTemplate.query(sql, new BookRowMapper(), "%" + authorName + "%");
+}
     // Assign an Author to a Book
     public int addBookAuthor(String isbn, int authorId) {
         String sql = "INSERT INTO Book_Author (book_isbn, author_id) VALUES (?, ?)";

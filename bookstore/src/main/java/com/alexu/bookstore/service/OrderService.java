@@ -21,7 +21,7 @@ public class OrderService {
 
     @Transactional // CRITICAL: If any step fails, everything rolls back
     public void checkout(int userId, String ccNumber, String ccExpiry) {
-        
+
         // 1. Get items from Cart
         List<ShoppingCart> cartItems = cartRepo.findByUserId(userId);
         if (cartItems.isEmpty()) {
@@ -32,12 +32,12 @@ public class OrderService {
         BigDecimal total = BigDecimal.ZERO;
         for (ShoppingCart cartItem : cartItems) {
             Book book = bookRepo.findByIsbn(cartItem.getBookIsbn());
-            
+
             // Check Stock (Part 1 Logic)
             if (book.getStockQuantity() < cartItem.getQuantity()) {
                 throw new RuntimeException("Not enough stock for book: " + book.getTitle());
             }
-            
+
             // Add to total
             BigDecimal itemTotal = book.getPrice().multiply(new BigDecimal(cartItem.getQuantity()));
             total = total.add(itemTotal);
@@ -49,13 +49,13 @@ public class OrderService {
         order.setTotalPrice(total);
         order.setCreditCardNumber(ccNumber);
         order.setCreditCardExpiry(ccExpiry);
-        
+
         int orderId = orderRepo.saveOrder(order); // Get the new ID
 
         // 4. Move items to Order_Item and Deduct Stock
         for (ShoppingCart cartItem : cartItems) {
             Book book = bookRepo.findByIsbn(cartItem.getBookIsbn());
-            
+
             // Create Order Item
             OrderItem orderItem = new OrderItem(book.getIsbn(), cartItem.getQuantity(), book.getPrice());
             orderRepo.saveOrderItem(orderId, orderItem);
@@ -66,5 +66,9 @@ public class OrderService {
 
         // 5. Clear the Cart
         cartRepo.deleteAll(userId);
+    }
+
+    public List<CustomerOrder> getOrdersByUserId(int userId) {
+        return orderRepo.findByUserId(userId);
     }
 }

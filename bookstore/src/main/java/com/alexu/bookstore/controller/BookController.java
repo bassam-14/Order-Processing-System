@@ -22,6 +22,7 @@ public class BookController {
         bookService.addBook(book);
         return "Book added successfully!";
     }
+
     // GET /api/books/12345 (View specific book)
     @GetMapping("/{isbn}")
     public Book getByIsbn(@PathVariable String isbn) {
@@ -41,5 +42,11 @@ public class BookController {
         book.setIsbn(isbn); // Ensure ID matches
         bookService.updateBookDetails(book);
         return "Book updated!";
+    }
+
+    // GET /api/books/author/Rowling
+    @GetMapping("/author/{name}")
+    public List<Book> getByAuthor(@PathVariable String name) {
+        return bookService.searchBooksByAuthor(name);
     }
 }

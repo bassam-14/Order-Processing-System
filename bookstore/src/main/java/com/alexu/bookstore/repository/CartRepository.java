@@ -48,6 +48,10 @@ public class CartRepository {
         String sql = "DELETE FROM Shopping_Cart WHERE user_id = ?";
         return jdbcTemplate.update(sql, userId);
     }
+    public int updateQuantity(int userId, String isbn, int newQuantity) {
+    String sql = "UPDATE Shopping_Cart SET quantity = ? WHERE user_id = ? AND book_isbn = ?";
+    return jdbcTemplate.update(sql, newQuantity, userId, isbn);
+}
 
     // Mapper
     private static class CartRowMapper implements RowMapper<ShoppingCart> {

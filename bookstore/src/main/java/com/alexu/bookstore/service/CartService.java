@@ -26,4 +26,11 @@ public class CartService {
     public void removeFromCart(int userId, String isbn) {
         cartRepo.delete(userId, isbn);
     }
+    public void updateItemQuantity(int userId, String isbn, int quantity) {
+    if (quantity <= 0) {
+        cartRepo.delete(userId, isbn); // If 0, remove item
+    } else {
+        cartRepo.updateQuantity(userId, isbn, quantity);
+    }
+}
 }

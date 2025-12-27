@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 
 @Repository
 public class OrderRepository {
@@ -40,4 +41,16 @@ public class OrderRepository {
         String sql = "INSERT INTO Order_Item (order_id, book_isbn, quantity, unit_price) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql, orderId, item.getBookIsbn(), item.getQuantity(), item.getUnitPrice());
     }
+    public List<CustomerOrder> findByUserId(int userId) {
+    String sql = "SELECT * FROM Customer_Order WHERE user_id = ? ORDER BY order_date DESC";
+    return jdbcTemplate.query(sql, (rs, rowNum) -> {
+        CustomerOrder order = new CustomerOrder();
+        order.setId(rs.getInt("id"));
+        order.setUserId(rs.getInt("user_id"));
+        order.setOrderDate(rs.getTimestamp("order_date"));
+        order.setTotalPrice(rs.getBigDecimal("total_price"));
+        // We generally don't return credit card info in history for security
+        return order;
+    }, userId);
+}
 }

@@ -32,4 +32,11 @@ public class CartController {
         cartService.removeFromCart(userId, isbn);
         return "Item removed from cart!";
     }
+
+    // PUT /api/cart/update?userId=5&isbn=123&quantity=3
+    @PutMapping("/update")
+    public String updateQuantity(@RequestParam int userId, @RequestParam String isbn, @RequestParam int quantity) {
+        cartService.updateItemQuantity(userId, isbn, quantity);
+        return "Cart updated!";
+    }
 }
