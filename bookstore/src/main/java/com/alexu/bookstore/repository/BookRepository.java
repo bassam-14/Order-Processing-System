@@ -1,31 +1,100 @@
 package com.alexu.bookstore.repository;
 
+import com.alexu.bookstore.model.Book;
+import com.alexu.bookstore.enums.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class BookRepository {
-    @Autowired
-    private JdbcTemplate db;
 
-    public List<Map<String, Object>> search(String text) {
-        String searchPattern = "%" + text + "%";
-        // JOINs are necessary to link Books to Publishers and Authors for searching
-        String query = "SELECT DISTINCT b.* FROM book b " +
-                       "LEFT JOIN publisher p ON b.publisher_id = p.id " +
-                       "LEFT JOIN book_author ba ON b.isbn = ba.book_isbn " +
-                       "LEFT JOIN author a ON ba.author_id = a.id " +
-                       "WHERE b.title LIKE ? OR b.isbn LIKE ? OR b.category LIKE ? " +
-                       "OR p.name LIKE ? OR a.name LIKE ?";
-                       
-        return db.queryForList(query, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    // 1. GET ALL BOOKS
+    public List<Book> findAll() {
+        String sql = "SELECT * FROM Book";
+        return jdbcTemplate.query(sql, new BookRowMapper());
     }
-    
-    // Helper to check stock (used in checkout)
-    public Integer getStock(String isbn) {
-        return db.queryForObject("SELECT stock_quantity FROM book WHERE isbn = ?", Integer.class, isbn);
+
+    // 2. SEARCH BY TITLE (Example Query)
+    public List<Book> findByTitle(String title) {
+        String sql = "SELECT * FROM Book WHERE title LIKE ?";
+        return jdbcTemplate.query(sql, new BookRowMapper(), "%" + title + "%");
+    }
+
+    // 3. ADD NEW BOOK
+    public int save(Book book) {
+        String sql = "INSERT INTO Book (isbn, title, publisher_id, publication_year, price, category, threshold, stock_quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        return jdbcTemplate.update(sql,
+                book.getIsbn(),
+                book.getTitle(),
+                book.getPublisherId(),
+                book.getPublicationYear(),
+                book.getPrice(),
+                book.getCategory().name(), // Convert Enum to String for DB
+                book.getThreshold(),
+                book.getStockQuantity());
+    }
+
+    // 4. UPDATE STOCK (Critical for Part 1)
+    public int updateStock(String isbn, int newQuantity) {
+        String sql = "UPDATE Book SET stock_quantity = ? WHERE isbn = ?";
+        return jdbcTemplate.update(sql, newQuantity, isbn);
+    }
+
+    // 5. GET SINGLE BOOK BY ISBN (For the "Details" page)
+    public Book findByIsbn(String isbn) {
+        String sql = "SELECT * FROM Book WHERE isbn = ?";
+        // We use queryForObject when we expect exactly one result
+        return jdbcTemplate.queryForObject(sql, new BookRowMapper(), isbn);
+    }
+
+    // 6. FILTER BY CATEGORY (For the sidebar filters)
+    public List<Book> findByCategory(String categoryName) {
+        String sql = "SELECT * FROM Book WHERE category = ?";
+        return jdbcTemplate.query(sql, new BookRowMapper(), categoryName);
+    }
+
+    // 7. EDIT BOOK DETAILS (For the Manager to fix mistakes)
+    public int update(Book book) {
+        String sql = "UPDATE Book SET title=?, publisher_id=?, publication_year=?, price=?, category=?, threshold=? WHERE isbn=?";
+        return jdbcTemplate.update(sql,
+                book.getTitle(),
+                book.getPublisherId(),
+                book.getPublicationYear(),
+                book.getPrice(),
+                book.getCategory().name(),
+                book.getThreshold(),
+                book.getIsbn());
+    }
+
+    // Assign an Author to a Book
+    public int addBookAuthor(String isbn, int authorId) {
+        String sql = "INSERT INTO Book_Author (book_isbn, author_id) VALUES (?, ?)";
+        return jdbcTemplate.update(sql, isbn, authorId);
+    }
+
+    // Mapper: Converts DB Row -> Java Object
+    private static class BookRowMapper implements RowMapper<Book> {
+        @Override
+        public Book mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Book book = new Book();
+            book.setIsbn(rs.getString("isbn"));
+            book.setTitle(rs.getString("title"));
+            book.setPublisherId(rs.getInt("publisher_id"));
+            book.setPublicationYear(rs.getInt("publication_year"));
+            book.setPrice(rs.getBigDecimal("price"));
+            book.setCategory(Category.valueOf(rs.getString("category"))); // String -> Enum
+            book.setThreshold(rs.getInt("threshold"));
+            book.setStockQuantity(rs.getInt("stock_quantity"));
+            return book;
+        }
     }
 }
