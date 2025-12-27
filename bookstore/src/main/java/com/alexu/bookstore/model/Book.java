@@ -75,5 +75,5 @@ public class Book {
         this.stockQuantity = stockQuantity;
     }
 
-    
+   
 }
